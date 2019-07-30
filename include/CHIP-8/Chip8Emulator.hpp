@@ -30,6 +30,7 @@ namespace CHIP8
 		byte m_soundTimer;
 
 		byte m_screenData[ScreenWidth * ScreenHeight];
+		bool m_drawableFlag;
 
 		byte m_keys[KeyCount];
 
@@ -43,6 +44,8 @@ namespace CHIP8
 		void setSoundTimer(byte timer);
 
 		const byte* getScreenData() const;
+
+		bool isDrawable() const;
 
 		byte* getKeys();
 

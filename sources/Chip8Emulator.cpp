@@ -53,6 +53,11 @@ const byte* Chip8Emulator::getScreenData() const
 	return m_screenData;
 }
 
+bool Chip8Emulator::isDrawable() const
+{
+	return m_drawableFlag;
+}
+
 byte* Chip8Emulator::getKeys()
 {
 	return m_keys;
@@ -94,6 +99,8 @@ bool Chip8Emulator::processNextOpCode()
 {
 	word opCode = GetNextOpCode();
 	m_programCounter += 2;
+
+	m_drawableFlag = false;
 
 	switch (opCode & 0xf000)
 	{
@@ -470,6 +477,8 @@ void Chip8Emulator::ProcessOpCodeDXYN(word opCode)
 			}
 		}
 	}
+
+	m_drawableFlag = true;
 }
 
 void Chip8Emulator::ProcessOpCodeEX9E(word opCode)

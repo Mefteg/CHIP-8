@@ -74,17 +74,18 @@ int main(int argc, char** argv)
 	chip8.resetCPU();
 	chip8.loadROM(path.c_str());
 
-	unsigned int fps = 60;
+	const unsigned int fps = 60;
 	float interval = 1000.0f / fps;
 	int opCodeCountPerSecond = 100 / fps;
 	auto timeSinceLastDraw = std::chrono::high_resolution_clock::now();
 
+
 	sf::RenderWindow window(sf::VideoMode(CHIP8::Chip8Emulator::ScreenWidth * RenderScale, CHIP8::Chip8Emulator::ScreenHeight * RenderScale), "CHIP-8");
+
 	sf::Texture texture;
-	sf::Sprite sprite;
-
-
     texture.create(CHIP8::Chip8Emulator::ScreenWidth, CHIP8::Chip8Emulator::ScreenHeight);
+
+	sf::Sprite sprite;
     sprite.setTexture(texture, true);
     sprite.setScale(sf::Vector2f(RenderScale, RenderScale));
 
@@ -104,37 +105,37 @@ int main(int argc, char** argv)
 		long long milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
 		if (milliseconds >= interval)
 		{
-			if (chip8.getDelayTimer() > 0)
-			{
-				chip8.setDelayTimer(chip8.getDelayTimer() - 1);
-			}
+	        if (chip8.getDelayTimer() > 0)
+	        {
+	        	chip8.setDelayTimer(chip8.getDelayTimer() - 1);
+	        }
 
-			if (chip8.getSoundTimer() > 0)
-			{
-				chip8.setSoundTimer(chip8.getSoundTimer() - 1);
-			}
+	        if (chip8.getSoundTimer() > 0)
+	        {
+	        	chip8.setSoundTimer(chip8.getSoundTimer() - 1);
+	        }
 
-			if (chip8.getSoundTimer() > 0)
-			{
+	        if (chip8.getSoundTimer() > 0)
+	        {
 				// BEEP !
-			}
+	        }
 
-			HandleInputs(chip8.getKeys());
+	        HandleInputs(chip8.getKeys());
 
-			// Process OpCodes for the frame.
-			for (int i = 0; i < opCodeCountPerSecond; ++i)
-			{
-				bool keepGoing = chip8.processNextOpCode();
-				if (keepGoing == false)
-				{
-					return EXIT_FAILURE;
-				}	
-			}
+			// Process OpCode for the frame.
+	        bool keepGoing = chip8.processNextOpCode();
+	        if (keepGoing == false)
+	        {
+	        	return EXIT_FAILURE;
+	        }	
 
-			// Draw the frame.
-			Draw(window, sprite, texture, chip8.getScreenData());
+			// draw the frame.
+	        if (chip8.isdrawable() == true)
+	        {
+	        	draw(window, sprite, texture, chip8.getscreendata());
+	        }
 
-			timeSinceLastDraw = now;
+	        timeSinceLastDraw = now;
 		}
     }
 
