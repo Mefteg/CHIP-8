@@ -1,0 +1,24 @@
+cmake_minimum_required(VERSION 3.9)
+
+# Project's name
+project(CHIP-8)
+set(EXECUTABLE_NAME "chip-8")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
+#set(CMAKE_LD_LIBRARIES "${CMAKE_LD_LIBRARIES} -lsfml-graphics")
+
+include_directories("include")
+link_directories("lib")
+
+# Sources & Headers
+file(GLOB SOURCES
+    ./*.cpp
+)
+
+file(GLOB HEADERS
+    ./*.h
+)
+
+# Executable
+add_executable(${EXECUTABLE_NAME} ${SOURCES} ${HEADERS})
+target_link_libraries(${EXECUTABLE_NAME} sfml-graphics sfml-window sfml-system)
