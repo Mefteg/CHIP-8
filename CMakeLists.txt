@@ -13,10 +13,11 @@ link_directories("lib")
 # Sources & Headers
 file(GLOB SOURCES
     ./*.cpp
+    ./sources/*.cpp
 )
 
 file(GLOB HEADERS
-    ./*.h
+    ./*.hpp
 )
 
 # Executable
