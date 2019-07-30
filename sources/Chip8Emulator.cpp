@@ -24,8 +24,6 @@ const byte Chip8Emulator::Fontset[80] = {
 };
 
 Chip8Emulator::Chip8Emulator()
-	: m_screenData(ScreenWidth * ScreenHeight)
-	, m_keys(KeyCount)
 {
 
 }
@@ -50,12 +48,12 @@ void Chip8Emulator::setSoundTimer(byte timer)
 	m_soundTimer = timer;
 }
 
-const std::vector<byte>& Chip8Emulator::getScreenData() const
+const byte* Chip8Emulator::getScreenData() const
 {
 	return m_screenData;
 }
 
-std::vector<byte>& Chip8Emulator::getKeys()
+byte* Chip8Emulator::getKeys()
 {
 	return m_keys;
 }
@@ -74,13 +72,16 @@ void Chip8Emulator::Chip8Emulator::resetCPU()
 	{
 		m_memory[i] = Fontset[i];	
 	}
+
+	memset(m_screenData, 0, ScreenWidth * ScreenHeight);
+	memset(m_keys, 0, KeyCount);
 }
 
-void Chip8Emulator::Chip8Emulator::loadROM(const std::string& path)
+void Chip8Emulator::Chip8Emulator::loadROM(const char* path)
 {
 	// Load in the game
    	FILE* fileDesc;
-   	fileDesc = fopen(path.c_str(), "rb");
+   	fileDesc = fopen(path, "rb");
 
    	// Skip CHIP-8 interpreter space in m_memory.
    	fread(&m_memory[0x200], 0xfff, 1, fileDesc);

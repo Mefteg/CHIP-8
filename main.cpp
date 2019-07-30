@@ -11,11 +11,7 @@
 
 const unsigned short RenderScale = 20;
 
-sf::RenderWindow RenderWindow(sf::VideoMode(CHIP8::Chip8Emulator::ScreenWidth * RenderScale, CHIP8::Chip8Emulator::ScreenHeight * RenderScale), "CHIP-8");
-sf::Texture RenderTexture;
-sf::Sprite RenderSprite;
-
-void HandleInput(std::vector<CHIP8::byte>& keys, CHIP8::byte keyIndex, sf::Keyboard::Key key)
+void HandleInput(CHIP8::byte* keys, CHIP8::byte keyIndex, sf::Keyboard::Key key)
 {
 	if (sf::Keyboard::isKeyPressed(key))
 	{
@@ -27,7 +23,7 @@ void HandleInput(std::vector<CHIP8::byte>& keys, CHIP8::byte keyIndex, sf::Keybo
 	}
 }
 
-void HandleInputs(std::vector<CHIP8::byte>& keys)
+void HandleInputs(CHIP8::byte* keys)
 {
 	HandleInput(keys, 4, sf::Keyboard::A);
 	HandleInput(keys, 5, sf::Keyboard::Left);
@@ -36,9 +32,9 @@ void HandleInputs(std::vector<CHIP8::byte>& keys)
 	HandleInput(keys, 8, sf::Keyboard::Down);
 }
 
-void Draw(const std::vector<CHIP8::byte>& screenData)
+void Draw(sf::RenderWindow& window, sf::Sprite& sprite, sf::Texture& texture, const CHIP8::byte* screenData)
 {
-	RenderWindow.clear();
+	window.clear();
 
 	unsigned short pixelCount = CHIP8::Chip8Emulator::ScreenWidth * CHIP8::Chip8Emulator::ScreenHeight;
 	CHIP8::byte pixels[pixelCount * 4];
@@ -56,11 +52,11 @@ void Draw(const std::vector<CHIP8::byte>& screenData)
 	    }
 	}
 
-	RenderTexture.update(pixels);
+	texture.update(pixels);
 
-	RenderWindow.draw(RenderSprite);
+	window.draw(sprite);
 
-	RenderWindow.display();
+	window.display();
 }
 
 int main(int argc, char** argv)
@@ -76,25 +72,30 @@ int main(int argc, char** argv)
 
 	CHIP8::Chip8Emulator chip8;
 	chip8.resetCPU();
-	chip8.loadROM(path);
+	chip8.loadROM(path.c_str());
 
 	unsigned int fps = 60;
 	float interval = 1000.0f / fps;
 	int opCodeCountPerSecond = 100 / fps;
 	auto timeSinceLastDraw = std::chrono::high_resolution_clock::now();
 
-    RenderTexture.create(CHIP8::Chip8Emulator::ScreenWidth, CHIP8::Chip8Emulator::ScreenHeight);
-    RenderSprite.setTexture(RenderTexture, true);
-    RenderSprite.setScale(sf::Vector2f(RenderScale, RenderScale));
+	sf::RenderWindow window(sf::VideoMode(CHIP8::Chip8Emulator::ScreenWidth * RenderScale, CHIP8::Chip8Emulator::ScreenHeight * RenderScale), "CHIP-8");
+	sf::Texture texture;
+	sf::Sprite sprite;
 
-    while (RenderWindow.isOpen())
+
+    texture.create(CHIP8::Chip8Emulator::ScreenWidth, CHIP8::Chip8Emulator::ScreenHeight);
+    sprite.setTexture(texture, true);
+    sprite.setScale(sf::Vector2f(RenderScale, RenderScale));
+
+    while (window.isOpen())
     {
         sf::Event event;
-        while (RenderWindow.pollEvent(event))
+        while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
             {
-                RenderWindow.close();
+                window.close();
             }
         }
 
@@ -131,7 +132,7 @@ int main(int argc, char** argv)
 			}
 
 			// Draw the frame.
-			Draw(chip8.getScreenData());
+			Draw(window, sprite, texture, chip8.getScreenData());
 
 			timeSinceLastDraw = now;
 		}

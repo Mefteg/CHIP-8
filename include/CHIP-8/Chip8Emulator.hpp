@@ -1,8 +1,6 @@
 #pragma once
 
 #include <stack>
-#include <vector>
-#include <string>
 
 #include "Chip8Types.hpp"
 
@@ -31,9 +29,9 @@ namespace CHIP8
 		byte m_delayTimer;
 		byte m_soundTimer;
 
-		std::vector<byte> m_screenData;
+		byte m_screenData[ScreenWidth * ScreenHeight];
 
-		std::vector<byte> m_keys;
+		byte m_keys[KeyCount];
 
 	public:
 		Chip8Emulator();
@@ -44,12 +42,12 @@ namespace CHIP8
 		byte getSoundTimer() const;
 		void setSoundTimer(byte timer);
 
-		const std::vector<byte>& getScreenData() const;
+		const byte* getScreenData() const;
 
-		std::vector<byte>& getKeys();
+		byte* getKeys();
 
 		void resetCPU();
-		void loadROM(const std::string& path);
+		void loadROM(const char* path);
 
 		bool processNextOpCode();
 
