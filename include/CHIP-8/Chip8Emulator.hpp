@@ -55,44 +55,46 @@ namespace CHIP8
 		bool processNextOpCode();
 
 	private:
-		word GetNextOpCode();
+		word getNextOpCode();
 
-		void ProcessOpCode00EE(word opCode);
+		void processOpCode00EE(word opCode);
 
-		void ProcessOpCode1NNN(word opCode);
+		void processOpCode1NNN(word opCode);
 
-		void ProcessOpCode2NNN(word opCode);
+		void processOpCode2NNN(word opCode);
 
-		void ProcessOpCode3XNN(word opCode);
+		void processOpCode3XNN(word opCode);
 
-		void ProcessOpCode4XNN(word opCode);
+		void processOpCode4XNN(word opCode);
 
-		void ProcessOpCode6XNN(word opCode);
+		void processOpCode6XNN(word opCode);
 
-		void ProcessOpCode7XNN(word opCode);
+		void processOpCode7XNN(word opCode);
 
-		void ProcessOpCode8XY0(word opCode);
-		void ProcessOpCode8XY2(word opCode);
-		void ProcessOpCode8XY4(word opCode);
-		void ProcessOpCode8XY5(word opCode);
+		void processOpCode8XY0(word opCode);
+		void processOpCode8XY2(word opCode);
+		void processOpCode8XY4(word opCode);
+		void processOpCode8XY5(word opCode);
 
-		void ProcessOpCode9XY0(word opCode);
+		void processOpCode9XY0(word opCode);
 
-		void ProcessOpCodeANNN(word opCode);
+		void processOpCodeANNN(word opCode);
 
-		void ProcessOpCodeCXNN(word opCode);
+		void processOpCodeCXNN(word opCode);
 
-		void ProcessOpCodeDXYN(word opCode);
+		void processOpCodeDXYN(word opCode);
 
-		void ProcessOpCodeEX9E(word opCode);
-		void ProcessOpCodeEXA1(word opCode);
+		void processOpCodeEX9E(word opCode);
+		void processOpCodeEXA1(word opCode);
 
-		void ProcessOpCodeFX07(word opCode);
-		void ProcessOpCodeFX15(word opCode);
-		void ProcessOpCodeFX18(word opCode);
-		void ProcessOpCodeFX1E(word opCode);
-		void ProcessOpCodeFX29(word opCode);
-		void ProcessOpCodeFX33(word opCode);
-		void ProcessOpCodeFX65(word opCode);
+		void processOpCodeFX07(word opCode);
+		void processOpCodeFX15(word opCode);
+		void processOpCodeFX18(word opCode);
+		void processOpCodeFX1E(word opCode);
+		void processOpCodeFX29(word opCode);
+		void processOpCodeFX33(word opCode);
+		void processOpCodeFX65(word opCode);
+
+		void unknownOpCode(word opCode);
 	};	
 }

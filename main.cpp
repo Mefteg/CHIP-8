@@ -130,9 +130,9 @@ int main(int argc, char** argv)
 	        }	
 
 			// draw the frame.
-	        if (chip8.isdrawable() == true)
+	        if (chip8.isDrawable() == true)
 	        {
-	        	draw(window, sprite, texture, chip8.getscreendata());
+	        	Draw(window, sprite, texture, chip8.getScreenData());
 	        }
 
 	        timeSinceLastDraw = now;

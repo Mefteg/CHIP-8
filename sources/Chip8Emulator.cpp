@@ -97,7 +97,7 @@ void Chip8Emulator::Chip8Emulator::loadROM(const char* path)
 
 bool Chip8Emulator::processNextOpCode()
 {
-	word opCode = GetNextOpCode();
+	word opCode = getNextOpCode();
 	m_programCounter += 2;
 
 	m_drawableFlag = false;
@@ -110,13 +110,13 @@ bool Chip8Emulator::processNextOpCode()
 			{
 				case 0x000e:
 				{
-					ProcessOpCode00EE(opCode);
+					processOpCode00EE(opCode);
 					break;
 				}
 
 				default:
 				{
-					std::cout << "Unknown OpCode: " << std::hex << opCode << std::endl;
+					unknownOpCode(opCode);
 					return false;
 				}
 			}
@@ -126,37 +126,37 @@ bool Chip8Emulator::processNextOpCode()
 
 		case 0x1000:
 		{
-			ProcessOpCode1NNN(opCode);
+			processOpCode1NNN(opCode);
 			break;
 		}
 
 		case 0x2000:
 		{
-			ProcessOpCode2NNN(opCode);
+			processOpCode2NNN(opCode);
 			break;
 		}
 
 		case 0x3000:
 		{
-			ProcessOpCode3XNN(opCode);
+			processOpCode3XNN(opCode);
 			break;
 		}
 
 		case 0x4000:
 		{
-			ProcessOpCode4XNN(opCode);
+			processOpCode4XNN(opCode);
 			break;
 		}
 
 		case 0x6000:
 		{
-			ProcessOpCode6XNN(opCode);
+			processOpCode6XNN(opCode);
 			break;
 		}
 
 		case 0x7000:
 		{
-			ProcessOpCode7XNN(opCode);
+			processOpCode7XNN(opCode);
 			break;
 		}
 
@@ -166,31 +166,31 @@ bool Chip8Emulator::processNextOpCode()
 			{
 				case 0x0000:
 				{
-					ProcessOpCode8XY0(opCode);
+					processOpCode8XY0(opCode);
 					break;
 				}
 
 				case 0x0002:
 				{
-					ProcessOpCode8XY2(opCode);
+					processOpCode8XY2(opCode);
 					break;
 				}
 
 				case 0x0004:
 				{
-					ProcessOpCode8XY4(opCode);
+					processOpCode8XY4(opCode);
 					break;
 				}
 
 				case 0x0005:
 				{
-					ProcessOpCode8XY5(opCode);
+					processOpCode8XY5(opCode);
 					break;
 				}
 
 				default:
 				{
-					std::cout << "Unknown OpCode: " << std::hex << opCode << std::endl;
+					unknownOpCode(opCode);
 					return false;
 				}
 			}
@@ -200,25 +200,25 @@ bool Chip8Emulator::processNextOpCode()
 
 		case 0x9000:
 		{
-			ProcessOpCode9XY0(opCode);
+			processOpCode9XY0(opCode);
 			break;
 		}
 
 		case 0xa000:
 		{
-			ProcessOpCodeANNN(opCode);
+			processOpCodeANNN(opCode);
 			break;
 		}
 
 		case 0xc000:
 		{
-			ProcessOpCodeCXNN(opCode);
+			processOpCodeCXNN(opCode);
 			break;
 		}
 
 		case 0xd000:
 		{
-			ProcessOpCodeDXYN(opCode);
+			processOpCodeDXYN(opCode);
 			break;
 		}
 
@@ -228,19 +228,19 @@ bool Chip8Emulator::processNextOpCode()
 			{
 				case 0x009E:
 				{
-					ProcessOpCodeEX9E(opCode);
+					processOpCodeEX9E(opCode);
 					break;
 				}
 
 				case 0x00A1:
 				{
-					ProcessOpCodeEXA1(opCode);
+					processOpCodeEXA1(opCode);
 					break;
 				}
 
 				default:
 				{
-					std::cout << "Unknown OpCode: " << std::hex << opCode << std::endl;
+					unknownOpCode(opCode);
 					return false;
 				}
 			}
@@ -254,49 +254,49 @@ bool Chip8Emulator::processNextOpCode()
 			{
 				case 0x0007:
 				{
-					ProcessOpCodeFX07(opCode);
+					processOpCodeFX07(opCode);
 					break;
 				}
 
 				case 0x0015:
 				{
-					ProcessOpCodeFX15(opCode);
+					processOpCodeFX15(opCode);
 					break;
 				}
 
 				case 0x0018:
 				{
-					ProcessOpCodeFX18(opCode);
+					processOpCodeFX18(opCode);
 					break;
 				}
 
 				case 0x001e:
 				{
-					ProcessOpCodeFX1E(opCode);
+					processOpCodeFX1E(opCode);
 					break;
 				}
 
 				case 0x0029:
 				{
-					ProcessOpCodeFX29(opCode);
+					processOpCodeFX29(opCode);
 					break;
 				}
 
 				case 0x0033:
 				{
-					ProcessOpCodeFX33(opCode);
+					processOpCodeFX33(opCode);
 					break;
 				}
 
 				case 0x0065:
 				{
-					ProcessOpCodeFX65(opCode);
+					processOpCodeFX65(opCode);
 					break;
 				}
 
 				default:
 				{
-					std::cout << "Unknown OpCode: " << std::hex << opCode << std::endl;
+					unknownOpCode(opCode);
 					return false;
 				}
 			}
@@ -306,7 +306,7 @@ bool Chip8Emulator::processNextOpCode()
 
 		default:
 		{
-			std::cout << "Unknown OpCode: " << std::hex << opCode << std::endl;
+			unknownOpCode(opCode);
 			return false;
 		}
 	}
@@ -314,7 +314,7 @@ bool Chip8Emulator::processNextOpCode()
 	return true;
 }
 
-word Chip8Emulator::GetNextOpCode()
+word Chip8Emulator::getNextOpCode()
 {
 	byte opCode[2] = {
 		m_memory[m_programCounter + 1],
@@ -324,24 +324,24 @@ word Chip8Emulator::GetNextOpCode()
 	return *((word*)opCode);
 }
 
-void Chip8Emulator::ProcessOpCode00EE(word opCode)
+void Chip8Emulator::processOpCode00EE(word opCode)
 {
 	m_programCounter = m_stack.top();
 	m_stack.pop();
 }
 
-void Chip8Emulator::ProcessOpCode1NNN(word opCode)
+void Chip8Emulator::processOpCode1NNN(word opCode)
 {
 	m_programCounter = opCode & 0x0fff;
 }
 
-void Chip8Emulator::ProcessOpCode2NNN(word opCode)
+void Chip8Emulator::processOpCode2NNN(word opCode)
 {
 	m_stack.push(m_programCounter);
 	m_programCounter = opCode & 0x0fff;
 }
 
-void Chip8Emulator::ProcessOpCode3XNN(word opCode)
+void Chip8Emulator::processOpCode3XNN(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	if (m_dataRegisters[x] == (opCode & 0x00ff))
@@ -350,7 +350,7 @@ void Chip8Emulator::ProcessOpCode3XNN(word opCode)
 	}
 }
 
-void Chip8Emulator::ProcessOpCode4XNN(word opCode)
+void Chip8Emulator::processOpCode4XNN(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	if (m_dataRegisters[x] != (opCode & 0x00ff))
@@ -359,33 +359,33 @@ void Chip8Emulator::ProcessOpCode4XNN(word opCode)
 	}
 }
 
-void Chip8Emulator::ProcessOpCode6XNN(word opCode)
+void Chip8Emulator::processOpCode6XNN(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_dataRegisters[x] = opCode & 0x00ff;
 }
 
-void Chip8Emulator::ProcessOpCode7XNN(word opCode)
+void Chip8Emulator::processOpCode7XNN(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_dataRegisters[x] += opCode & 0x00ff;
 }
 
-void Chip8Emulator::ProcessOpCode8XY0(word opCode)
+void Chip8Emulator::processOpCode8XY0(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	byte y = (opCode & 0x00f0) >> 4;
 	m_dataRegisters[x] = m_dataRegisters[y];
 }
 
-void Chip8Emulator::ProcessOpCode8XY2(word opCode)
+void Chip8Emulator::processOpCode8XY2(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	byte y = (opCode & 0x00f0) >> 4;
 	m_dataRegisters[x] = m_dataRegisters[x] & m_dataRegisters[y];
 }
 
-void Chip8Emulator::ProcessOpCode8XY4(word opCode)
+void Chip8Emulator::processOpCode8XY4(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	byte y = (opCode & 0x00f0) >> 4;
@@ -400,7 +400,7 @@ void Chip8Emulator::ProcessOpCode8XY4(word opCode)
 	m_dataRegisters[x] += m_dataRegisters[y];
 }
 
-void Chip8Emulator::ProcessOpCode8XY5(word opCode)
+void Chip8Emulator::processOpCode8XY5(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	byte y = (opCode & 0x00f0) >> 4;
@@ -415,7 +415,7 @@ void Chip8Emulator::ProcessOpCode8XY5(word opCode)
 	m_dataRegisters[x] -= m_dataRegisters[y];
 }
 
-void Chip8Emulator::ProcessOpCode9XY0(word opCode)
+void Chip8Emulator::processOpCode9XY0(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	byte y = (opCode & 0x00f0) >> 4;
@@ -426,18 +426,18 @@ void Chip8Emulator::ProcessOpCode9XY0(word opCode)
 	}
 }
 
-void Chip8Emulator::ProcessOpCodeANNN(word opCode)
+void Chip8Emulator::processOpCodeANNN(word opCode)
 {
 	m_addressRegisterI = opCode & 0x0fff;
 }
 
-void Chip8Emulator::ProcessOpCodeCXNN(word opCode)
+void Chip8Emulator::processOpCodeCXNN(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_dataRegisters[x] = rand() & (opCode & 0x00ff);
 }
 
-void Chip8Emulator::ProcessOpCodeDXYN(word opCode)
+void Chip8Emulator::processOpCodeDXYN(word opCode)
 {
 	m_dataRegisters[0xf] = 0;
 
@@ -481,16 +481,16 @@ void Chip8Emulator::ProcessOpCodeDXYN(word opCode)
 	m_drawableFlag = true;
 }
 
-void Chip8Emulator::ProcessOpCodeEX9E(word opCode)
+void Chip8Emulator::processOpCodeEX9E(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
-	if (m_keys[m_dataRegisters[x]] > 0)
+	if (m_keys[m_dataRegisters[x]] != 0)
 	{
 		m_programCounter += 2;
 	}
 }
 
-void Chip8Emulator::ProcessOpCodeEXA1(word opCode)
+void Chip8Emulator::processOpCodeEXA1(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	if (m_keys[m_dataRegisters[x]] == 0)
@@ -499,37 +499,37 @@ void Chip8Emulator::ProcessOpCodeEXA1(word opCode)
 	}
 }
 
-void Chip8Emulator::ProcessOpCodeFX07(word opCode)
+void Chip8Emulator::processOpCodeFX07(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_dataRegisters[x] = m_delayTimer;
 }
 
-void Chip8Emulator::ProcessOpCodeFX15(word opCode)
+void Chip8Emulator::processOpCodeFX15(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_delayTimer = m_dataRegisters[x];
 }
 
-void Chip8Emulator::ProcessOpCodeFX18(word opCode)
+void Chip8Emulator::processOpCodeFX18(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_soundTimer = m_dataRegisters[x];
 }
 
-void Chip8Emulator::ProcessOpCodeFX1E(word opCode)
+void Chip8Emulator::processOpCodeFX1E(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_addressRegisterI += m_dataRegisters[x];
 }
 
-void Chip8Emulator::ProcessOpCodeFX29(word opCode)
+void Chip8Emulator::processOpCodeFX29(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_addressRegisterI = m_dataRegisters[x] * 5;
 }
 
-void Chip8Emulator::ProcessOpCodeFX33(word opCode)
+void Chip8Emulator::processOpCodeFX33(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	byte value = m_dataRegisters[x];
@@ -539,7 +539,7 @@ void Chip8Emulator::ProcessOpCodeFX33(word opCode)
 	m_memory[m_addressRegisterI + 2] = value % 10; // Units.
 }
 
-void Chip8Emulator::ProcessOpCodeFX65(word opCode)
+void Chip8Emulator::processOpCodeFX65(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 
@@ -549,4 +549,9 @@ void Chip8Emulator::ProcessOpCodeFX65(word opCode)
 	}
 
 	m_addressRegisterI += x + 1;
+}
+
+void Chip8Emulator::unknownOpCode(word opCode)
+{
+	std::cout << "Unknown OpCode: " << std::hex << opCode << std::endl;	
 }
