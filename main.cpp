@@ -25,6 +25,11 @@ void HandleInput(CHIP8::byte* keys, CHIP8::byte keyIndex, sf::Keyboard::Key key)
 
 void HandleInputs(CHIP8::byte* keys)
 {
+	for (int i = 0; i < 16; ++i)
+	{
+		keys[i] = 0;
+	}
+
 	HandleInput(keys, 4, sf::Keyboard::A);
 	HandleInput(keys, 5, sf::Keyboard::Left);
 	HandleInput(keys, 6, sf::Keyboard::Right);
@@ -105,21 +110,6 @@ int main(int argc, char** argv)
 		long long milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
 		if (milliseconds >= interval)
 		{
-	        if (chip8.getDelayTimer() > 0)
-	        {
-	        	chip8.setDelayTimer(chip8.getDelayTimer() - 1);
-	        }
-
-	        if (chip8.getSoundTimer() > 0)
-	        {
-	        	chip8.setSoundTimer(chip8.getSoundTimer() - 1);
-	        }
-
-	        if (chip8.getSoundTimer() > 0)
-	        {
-				// BEEP !
-	        }
-
 	        HandleInputs(chip8.getKeys());
 
 			// Process OpCode for the frame.
@@ -128,6 +118,11 @@ int main(int argc, char** argv)
 	        {
 	        	return EXIT_FAILURE;
 	        }	
+
+        	if (chip8.isBeepPlayable() == true)
+        	{
+				// BEEP !
+        	}
 
 			// draw the frame.
 	        if (chip8.isDrawable() == true)

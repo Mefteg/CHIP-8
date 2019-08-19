@@ -28,6 +28,7 @@ namespace CHIP8
 
 		byte m_delayTimer;
 		byte m_soundTimer;
+		bool m_beepFlag;
 
 		byte m_screenData[ScreenWidth * ScreenHeight];
 		bool m_drawableFlag;
@@ -37,11 +38,7 @@ namespace CHIP8
 	public:
 		Chip8Emulator();
 
-		byte getDelayTimer() const;
-		void setDelayTimer(byte timer);
-
-		byte getSoundTimer() const;
-		void setSoundTimer(byte timer);
+		bool isBeepPlayable() const;
 
 		const byte* getScreenData() const;
 

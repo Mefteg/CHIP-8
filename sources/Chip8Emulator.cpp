@@ -28,24 +28,9 @@ Chip8Emulator::Chip8Emulator()
 
 }
 
-byte Chip8Emulator::getDelayTimer() const
+bool Chip8Emulator::isBeepPlayable() const
 {
-	return m_delayTimer;
-}
-
-void Chip8Emulator::setDelayTimer(byte timer)
-{
-	m_delayTimer = timer;
-}
-
-byte Chip8Emulator::getSoundTimer() const
-{
-	return m_soundTimer;
-}
-
-void Chip8Emulator::setSoundTimer(byte timer)
-{
-	m_soundTimer = timer;
+	return m_beepFlag;
 }
 
 const byte* Chip8Emulator::getScreenData() const
@@ -98,9 +83,9 @@ void Chip8Emulator::Chip8Emulator::loadROM(const char* path)
 bool Chip8Emulator::processNextOpCode()
 {
 	word opCode = getNextOpCode();
-	m_programCounter += 2;
 
 	m_drawableFlag = false;
+	m_beepFlag = false;
 
 	switch (opCode & 0xf000)
 	{
@@ -311,6 +296,21 @@ bool Chip8Emulator::processNextOpCode()
 		}
 	}
 
+	if (m_delayTimer > 0)
+	{
+		--m_delayTimer;
+	}
+
+	if (m_soundTimer > 0)
+	{
+		if (m_soundTimer == 1)
+		{
+			m_beepFlag = true;
+		}
+
+		--m_soundTimer;
+	}
+
 	return true;
 }
 
@@ -326,7 +326,7 @@ word Chip8Emulator::getNextOpCode()
 
 void Chip8Emulator::processOpCode00EE(word opCode)
 {
-	m_programCounter = m_stack.top();
+	m_programCounter = m_stack.top() + 2;
 	m_stack.pop();
 }
 
@@ -346,6 +346,10 @@ void Chip8Emulator::processOpCode3XNN(word opCode)
 	byte x = (opCode & 0x0f00) >> 8;
 	if (m_dataRegisters[x] == (opCode & 0x00ff))
 	{
+		m_programCounter += 4;
+	}
+	else
+	{
 		m_programCounter += 2;
 	}
 }
@@ -355,6 +359,10 @@ void Chip8Emulator::processOpCode4XNN(word opCode)
 	byte x = (opCode & 0x0f00) >> 8;
 	if (m_dataRegisters[x] != (opCode & 0x00ff))
 	{
+		m_programCounter += 4;
+	}
+	else
+	{
 		m_programCounter += 2;
 	}
 }
@@ -363,12 +371,16 @@ void Chip8Emulator::processOpCode6XNN(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_dataRegisters[x] = opCode & 0x00ff;
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCode7XNN(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_dataRegisters[x] += opCode & 0x00ff;
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCode8XY0(word opCode)
@@ -376,6 +388,8 @@ void Chip8Emulator::processOpCode8XY0(word opCode)
 	byte x = (opCode & 0x0f00) >> 8;
 	byte y = (opCode & 0x00f0) >> 4;
 	m_dataRegisters[x] = m_dataRegisters[y];
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCode8XY2(word opCode)
@@ -383,6 +397,8 @@ void Chip8Emulator::processOpCode8XY2(word opCode)
 	byte x = (opCode & 0x0f00) >> 8;
 	byte y = (opCode & 0x00f0) >> 4;
 	m_dataRegisters[x] = m_dataRegisters[x] & m_dataRegisters[y];
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCode8XY4(word opCode)
@@ -398,6 +414,8 @@ void Chip8Emulator::processOpCode8XY4(word opCode)
 	m_dataRegisters[0xf] = valueX + valueY > 0xff ? 1 : 0;
 
 	m_dataRegisters[x] += m_dataRegisters[y];
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCode8XY5(word opCode)
@@ -413,6 +431,8 @@ void Chip8Emulator::processOpCode8XY5(word opCode)
 	m_dataRegisters[0xf] = m_dataRegisters[x] < m_dataRegisters[y] ? 0 : 1;
 
 	m_dataRegisters[x] -= m_dataRegisters[y];
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCode9XY0(word opCode)
@@ -422,6 +442,10 @@ void Chip8Emulator::processOpCode9XY0(word opCode)
 
 	if (m_dataRegisters[x] != m_dataRegisters[y])
 	{
+		m_programCounter += 4;
+	}
+	else
+	{
 		m_programCounter += 2;
 	}
 }
@@ -429,12 +453,16 @@ void Chip8Emulator::processOpCode9XY0(word opCode)
 void Chip8Emulator::processOpCodeANNN(word opCode)
 {
 	m_addressRegisterI = opCode & 0x0fff;
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCodeCXNN(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_dataRegisters[x] = rand() & (opCode & 0x00ff);
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCodeDXYN(word opCode)
@@ -479,12 +507,18 @@ void Chip8Emulator::processOpCodeDXYN(word opCode)
 	}
 
 	m_drawableFlag = true;
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCodeEX9E(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	if (m_keys[m_dataRegisters[x]] != 0)
+	{
+		m_programCounter += 4;
+	}
+	else
 	{
 		m_programCounter += 2;
 	}
@@ -495,6 +529,10 @@ void Chip8Emulator::processOpCodeEXA1(word opCode)
 	byte x = (opCode & 0x0f00) >> 8;
 	if (m_keys[m_dataRegisters[x]] == 0)
 	{
+		m_programCounter += 4;
+	}
+	else
+	{
 		m_programCounter += 2;
 	}
 }
@@ -503,30 +541,40 @@ void Chip8Emulator::processOpCodeFX07(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_dataRegisters[x] = m_delayTimer;
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCodeFX15(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_delayTimer = m_dataRegisters[x];
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCodeFX18(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_soundTimer = m_dataRegisters[x];
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCodeFX1E(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_addressRegisterI += m_dataRegisters[x];
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCodeFX29(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	m_addressRegisterI = m_dataRegisters[x] * 5;
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCodeFX33(word opCode)
@@ -537,6 +585,8 @@ void Chip8Emulator::processOpCodeFX33(word opCode)
 	m_memory[m_addressRegisterI] = value / 100; // Hundreds.
 	m_memory[m_addressRegisterI + 1] = (value / 10) % 10; // Tens.
 	m_memory[m_addressRegisterI + 2] = value % 10; // Units.
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::processOpCodeFX65(word opCode)
@@ -549,6 +599,8 @@ void Chip8Emulator::processOpCodeFX65(word opCode)
 	}
 
 	m_addressRegisterI += x + 1;
+
+	m_programCounter += 2;
 }
 
 void Chip8Emulator::unknownOpCode(word opCode)
