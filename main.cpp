@@ -81,9 +81,6 @@ int main(int argc, char** argv)
 
 	const unsigned int fps = 60;
 	float interval = 1000.0f / fps;
-	int opCodeCountPerSecond = 100 / fps;
-	auto timeSinceLastDraw = std::chrono::high_resolution_clock::now();
-
 
 	sf::RenderWindow window(sf::VideoMode(CHIP8::Chip8Emulator::ScreenWidth * RenderScale, CHIP8::Chip8Emulator::ScreenHeight * RenderScale), "CHIP-8");
 
@@ -106,32 +103,33 @@ int main(int argc, char** argv)
         }
 
         auto now = std::chrono::high_resolution_clock::now();
-		auto elapsed = now - timeSinceLastDraw;
-		long long milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-		if (milliseconds >= interval)
-		{
-	        HandleInputs(chip8.getKeys());
 
-			// Process OpCode for the frame.
-	        bool keepGoing = chip8.processNextOpCode();
-	        if (keepGoing == false)
-	        {
-	        	return EXIT_FAILURE;
-	        }	
+        HandleInputs(chip8.getKeys());
 
-        	if (chip8.isBeepPlayable() == true)
-        	{
-				// BEEP !
-        	}
+		// Process OpCode for the frame.
+        bool keepGoing = chip8.processNextOpCode();
+        if (keepGoing == false)
+        {
+        	return EXIT_FAILURE;
+        }	
 
-			// draw the frame.
-	        if (chip8.isDrawable() == true)
-	        {
-	        	Draw(window, sprite, texture, chip8.getScreenData());
-	        }
+    	if (chip8.isBeepPlayable() == true)
+    	{
+			// BEEP !
+    	}
 
-	        timeSinceLastDraw = now;
-		}
+		// draw the frame.
+        if (chip8.isDrawable() == true)
+        {
+        	Draw(window, sprite, texture, chip8.getScreenData());
+        }
+
+        auto timeAfter = std::chrono::high_resolution_clock::now();
+		auto elapsed = timeAfter - now;
+        long long elapsedMillis = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+
+        // The process doesn't take 1/60 second, so wait the remaining time.
+		sf::sleep(sf::milliseconds(interval - elapsedMillis));
     }
 
 	return EXIT_SUCCESS;

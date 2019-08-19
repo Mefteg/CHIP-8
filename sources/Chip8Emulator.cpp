@@ -396,7 +396,7 @@ void Chip8Emulator::processOpCode8XY2(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 	byte y = (opCode & 0x00f0) >> 4;
-	m_dataRegisters[x] = m_dataRegisters[x] & m_dataRegisters[y];
+	m_dataRegisters[x] &= m_dataRegisters[y];
 
 	m_programCounter += 2;
 }
@@ -564,6 +564,14 @@ void Chip8Emulator::processOpCodeFX18(word opCode)
 void Chip8Emulator::processOpCodeFX1E(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
+	if(m_addressRegisterI + m_dataRegisters[x] > 0xfff)
+	{
+		m_dataRegisters[0xf] = 1;
+	}
+	else
+	{
+		m_dataRegisters[0xf] = 0;
+	}
 	m_addressRegisterI += m_dataRegisters[x];
 
 	m_programCounter += 2;
