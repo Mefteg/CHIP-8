@@ -20,6 +20,8 @@ namespace CHIP8
 
 		static const byte Fontset[80];
 
+		static const word CyclesPerFrame = 10;
+
 		byte m_memory[MemorySize];
 		byte m_dataRegisters[RegisterCount];
 		word m_addressRegisterI;
@@ -48,10 +50,10 @@ namespace CHIP8
 
 		void resetCPU();
 		void loadROM(const char* path);
-
-		bool processNextOpCode();
+		bool update();
 
 	private:
+		bool processNextOpCode();
 		word getNextOpCode();
 
 		void processOpCode00EE(word opCode);
@@ -93,5 +95,7 @@ namespace CHIP8
 		void processOpCodeFX65(word opCode);
 
 		void unknownOpCode(word opCode);
+
+		void processTimers();
 	};	
 }

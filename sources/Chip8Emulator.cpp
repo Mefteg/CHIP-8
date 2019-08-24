@@ -79,13 +79,28 @@ void Chip8Emulator::Chip8Emulator::loadROM(const char* path)
    	fclose(fileDesc);
 }
 
+bool Chip8Emulator::update()
+{
+	m_drawableFlag = false;
+	m_beepFlag = false;
+
+	for (int i = 0; i < CyclesPerFrame; ++i)
+	{
+		bool keepGoing = processNextOpCode();
+		if (keepGoing == false)
+		{
+			return false;
+		}	
+	}
+
+	processTimers();	
+
+	return true;
+}
 
 bool Chip8Emulator::processNextOpCode()
 {
 	word opCode = getNextOpCode();
-
-	m_drawableFlag = false;
-	m_beepFlag = false;
 
 	switch (opCode & 0xf000)
 	{
@@ -294,21 +309,6 @@ bool Chip8Emulator::processNextOpCode()
 			unknownOpCode(opCode);
 			return false;
 		}
-	}
-
-	if (m_delayTimer > 0)
-	{
-		--m_delayTimer;
-	}
-
-	if (m_soundTimer > 0)
-	{
-		if (m_soundTimer == 1)
-		{
-			m_beepFlag = true;
-		}
-
-		--m_soundTimer;
 	}
 
 	return true;
@@ -614,4 +614,22 @@ void Chip8Emulator::processOpCodeFX65(word opCode)
 void Chip8Emulator::unknownOpCode(word opCode)
 {
 	std::cout << "Unknown OpCode: " << std::hex << opCode << std::endl;	
+}
+
+void Chip8Emulator::processTimers()
+{
+	if (m_delayTimer > 0)
+	{
+		--m_delayTimer;
+	}
+
+	if (m_soundTimer > 0)
+	{
+		if (m_soundTimer == 1)
+		{
+			m_beepFlag = true;
+		}
+
+		--m_soundTimer;
+	}
 }

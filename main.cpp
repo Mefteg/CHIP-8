@@ -124,8 +124,8 @@ int main(int argc, char** argv)
 
         HandleInputs(chip8.getKeys());
 
-		// Process OpCode for the frame.
-        bool keepGoing = chip8.processNextOpCode();
+		// Update CHIP-8.
+        bool keepGoing = chip8.update();
         if (keepGoing == false)
         {
         	return EXIT_FAILURE;
