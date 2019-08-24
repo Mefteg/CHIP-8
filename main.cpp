@@ -147,8 +147,10 @@ int main(int argc, char** argv)
 		auto elapsedTime = timeAfterEmulation - timeBeforeEmulation;
         long long elapsedTimeInMillis = std::chrono::duration_cast<std::chrono::milliseconds>(elapsedTime).count();
 
+        long long sleepingDuration = interval - elapsedTimeInMillis;
+        sleepingDuration = sleepingDuration > 0 ? sleepingDuration : 0;
         // The process doesn't take 1/60 second, so wait the remaining time.
-		sf::sleep(sf::milliseconds(interval - elapsedTimeInMillis));
+		sf::sleep(sf::milliseconds(sleepingDuration));
     }
 
 	return EXIT_SUCCESS;
