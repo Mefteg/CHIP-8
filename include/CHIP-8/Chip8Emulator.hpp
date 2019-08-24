@@ -56,6 +56,7 @@ namespace CHIP8
 		bool processNextOpCode();
 		word getNextOpCode();
 
+		void processOpCode00E0(word opCode);
 		void processOpCode00EE(word opCode);
 
 		void processOpCode1NNN(word opCode);
@@ -72,8 +73,10 @@ namespace CHIP8
 
 		void processOpCode8XY0(word opCode);
 		void processOpCode8XY2(word opCode);
+		void processOpCode8XY3(word opCode);
 		void processOpCode8XY4(word opCode);
 		void processOpCode8XY5(word opCode);
+		void processOpCode8XY6(word opCode);
 
 		void processOpCode9XY0(word opCode);
 
@@ -87,6 +90,7 @@ namespace CHIP8
 		void processOpCodeEXA1(word opCode);
 
 		void processOpCodeFX07(word opCode);
+		void processOpCodeFX0A(word opCode);
 		void processOpCodeFX15(word opCode);
 		void processOpCodeFX18(word opCode);
 		void processOpCodeFX1E(word opCode);
