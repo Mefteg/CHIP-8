@@ -84,7 +84,7 @@ bool Chip8Emulator::update()
 	m_drawableFlag = false;
 	m_beepFlag = false;
 
-	for (int i = 0; i < CyclesPerFrame; ++i)
+	for (word i = 0; i < CyclesPerFrame; ++i)
 	{
 		bool keepGoing = processNextOpCode();
 		if (keepGoing == false)
@@ -176,6 +176,12 @@ bool Chip8Emulator::processNextOpCode()
 					break;
 				}
 
+				case 0x0001:
+				{
+					processOpCode8XY1(opCode);
+					break;
+				}
+
 				case 0x0002:
 				{
 					processOpCode8XY2(opCode);
@@ -203,6 +209,12 @@ bool Chip8Emulator::processNextOpCode()
 				case 0x0006:
 				{
 					processOpCode8XY6(opCode);
+					break;
+				}
+
+				case 0x000e:
+				{
+					processOpCode8XYE(opCode);
 					break;
 				}
 
@@ -309,6 +321,12 @@ bool Chip8Emulator::processNextOpCode()
 				case 0x0033:
 				{
 					processOpCodeFX33(opCode);
+					break;
+				}
+
+				case 0x0055:
+				{
+					processOpCodeFX55(opCode);
 					break;
 				}
 
@@ -427,6 +445,16 @@ void Chip8Emulator::processOpCode8XY0(word opCode)
 	m_programCounter += 2;
 }
 
+void Chip8Emulator::processOpCode8XY1(word opCode)
+{
+	byte x = (opCode & 0x0f00) >> 8;
+	byte y = (opCode & 0x00f0) >> 4;
+
+	m_dataRegisters[x] |= m_dataRegisters[y];
+
+	m_programCounter += 2;
+}
+
 void Chip8Emulator::processOpCode8XY2(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
@@ -492,6 +520,17 @@ void Chip8Emulator::processOpCode8XY6(word opCode)
 	m_programCounter += 2;
 }
 
+void Chip8Emulator::processOpCode8XYE(word opCode)
+{
+	byte x = (opCode & 0x0f00) >> 8;
+	short valueX = m_dataRegisters[x];
+
+	m_dataRegisters[0xf] = valueX >> 7;
+	m_dataRegisters[x] <<= 1;
+
+	m_programCounter += 2;
+}
+
 void Chip8Emulator::processOpCode9XY0(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
@@ -542,7 +581,7 @@ void Chip8Emulator::processOpCodeDXYN(word opCode)
 			byte currentBitMask = 1 << ((8 - 1) - j);
 			if ((spriteLine & currentBitMask) > 0)
 			{
-				int pixelIndex = (coordX + j) * ScreenHeight + (coordY + i);
+				word pixelIndex = (coordX + j) * ScreenHeight + (coordY + i);
 				byte screenPixel = m_screenData[pixelIndex];
 
 				if (screenPixel == 1)
@@ -606,13 +645,13 @@ void Chip8Emulator::processOpCodeFX0A(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 
-	for (int i = 0; i < 16; ++i)
+	for (byte i = 0; i < 16; ++i)
 	{
 		if (m_keys[i] > 0)
 		{
 			m_dataRegisters[x] = i;
 			m_programCounter += 2;
-			
+
 			return;
 		}
 	}
@@ -666,6 +705,20 @@ void Chip8Emulator::processOpCodeFX33(word opCode)
 	m_memory[m_addressRegisterI] = value / 100; // Hundreds.
 	m_memory[m_addressRegisterI + 1] = (value / 10) % 10; // Tens.
 	m_memory[m_addressRegisterI + 2] = value % 10; // Units.
+
+	m_programCounter += 2;
+}
+
+void Chip8Emulator::processOpCodeFX55(word opCode)
+{
+	byte x = (opCode & 0x0f00) >> 8;
+	
+	for (byte i = 0; i <= x; ++i)
+	{
+		m_memory[m_addressRegisterI + i] = m_dataRegisters[i];
+	}
+
+	m_addressRegisterI += x + 1;
 
 	m_programCounter += 2;
 }

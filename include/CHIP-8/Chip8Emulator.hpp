@@ -72,11 +72,13 @@ namespace CHIP8
 		void processOpCode7XNN(word opCode);
 
 		void processOpCode8XY0(word opCode);
+		void processOpCode8XY1(word opCode);
 		void processOpCode8XY2(word opCode);
 		void processOpCode8XY3(word opCode);
 		void processOpCode8XY4(word opCode);
 		void processOpCode8XY5(word opCode);
 		void processOpCode8XY6(word opCode);
+		void processOpCode8XYE(word opCode);
 
 		void processOpCode9XY0(word opCode);
 
@@ -96,6 +98,7 @@ namespace CHIP8
 		void processOpCodeFX1E(word opCode);
 		void processOpCodeFX29(word opCode);
 		void processOpCodeFX33(word opCode);
+		void processOpCodeFX55(word opCode);
 		void processOpCodeFX65(word opCode);
 
 		void unknownOpCode(word opCode);
