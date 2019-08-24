@@ -30,11 +30,23 @@ void HandleInputs(CHIP8::byte* keys)
 		keys[i] = 0;
 	}
 
-	HandleInput(keys, 4, sf::Keyboard::A);
-	HandleInput(keys, 5, sf::Keyboard::Left);
-	HandleInput(keys, 6, sf::Keyboard::Right);
-	HandleInput(keys, 7, sf::Keyboard::Up);
-	HandleInput(keys, 8, sf::Keyboard::Down);
+	HandleInput(keys, 0x0, sf::Keyboard::X);
+	HandleInput(keys, 0x1, sf::Keyboard::Num1);
+	HandleInput(keys, 0x2, sf::Keyboard::Num2);
+	HandleInput(keys, 0x3, sf::Keyboard::Num3);
+	HandleInput(keys, 0xC, sf::Keyboard::Num4);
+	HandleInput(keys, 0x4, sf::Keyboard::Q);
+	HandleInput(keys, 0x5, sf::Keyboard::W);
+	HandleInput(keys, 0x6, sf::Keyboard::E);
+	HandleInput(keys, 0xD, sf::Keyboard::R);
+	HandleInput(keys, 0x7, sf::Keyboard::A);
+	HandleInput(keys, 0x8, sf::Keyboard::S);
+	HandleInput(keys, 0x9, sf::Keyboard::D);
+	HandleInput(keys, 0xE, sf::Keyboard::F);
+	HandleInput(keys, 0xA, sf::Keyboard::Z);
+	HandleInput(keys, 0x0, sf::Keyboard::X);
+	HandleInput(keys, 0xB, sf::Keyboard::C);
+	HandleInput(keys, 0xF, sf::Keyboard::V);
 }
 
 void Draw(sf::RenderWindow& window, sf::Sprite& sprite, sf::Texture& texture, const CHIP8::byte* screenData)
