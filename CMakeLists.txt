@@ -5,7 +5,6 @@ project(CHIP-8)
 set(EXECUTABLE_NAME "chip-8")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
-#set(CMAKE_LD_LIBRARIES "${CMAKE_LD_LIBRARIES} -lsfml-graphics")
 
 include_directories("include")
 link_directories("lib")
@@ -22,4 +21,4 @@ file(GLOB HEADERS
 
 # Executable
 add_executable(${EXECUTABLE_NAME} ${SOURCES} ${HEADERS})
-target_link_libraries(${EXECUTABLE_NAME} sfml-graphics sfml-window sfml-system)
+target_link_libraries(${EXECUTABLE_NAME} sfml-graphics sfml-window sfml-system sfml-audio)

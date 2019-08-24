@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 #include <CHIP-8/Chip8Emulator.hpp>
 
@@ -103,6 +104,11 @@ int main(int argc, char** argv)
     sprite.setTexture(texture, true);
     sprite.setScale(sf::Vector2f(RenderScale, RenderScale));
 
+    sf::SoundBuffer beepBuffer;
+    beepBuffer.loadFromFile("../resources/sounds/beep.wav");
+    sf::Sound beep;
+    beep.setBuffer(beepBuffer);
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -128,6 +134,7 @@ int main(int argc, char** argv)
     	if (chip8.isBeepPlayable() == true)
     	{
 			// BEEP !
+			beep.play();
     	}
 
 		// draw the frame.
