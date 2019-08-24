@@ -120,7 +120,7 @@ int main(int argc, char** argv)
             }
         }
 
-        auto now = std::chrono::high_resolution_clock::now();
+        auto timeBeforeEmulation = std::chrono::high_resolution_clock::now();
 
         HandleInputs(chip8.getKeys());
 
@@ -143,12 +143,12 @@ int main(int argc, char** argv)
         	Draw(window, sprite, texture, chip8.getScreenData());
         }
 
-        auto timeAfter = std::chrono::high_resolution_clock::now();
-		auto elapsed = timeAfter - now;
-        long long elapsedMillis = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+        auto timeAfterEmulation = std::chrono::high_resolution_clock::now();
+		auto elapsedTime = timeAfterEmulation - timeBeforeEmulation;
+        long long elapsedTimeInMillis = std::chrono::duration_cast<std::chrono::milliseconds>(elapsedTime).count();
 
         // The process doesn't take 1/60 second, so wait the remaining time.
-		sf::sleep(sf::milliseconds(interval - elapsedMillis));
+		sf::sleep(sf::milliseconds(interval - elapsedTimeInMillis));
     }
 
 	return EXIT_SUCCESS;
