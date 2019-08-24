@@ -66,6 +66,8 @@ namespace CHIP8
 		void processOpCode3XNN(word opCode);
 
 		void processOpCode4XNN(word opCode);
+		
+		void processOpCode5XY0(word opCode);
 
 		void processOpCode6XNN(word opCode);
 

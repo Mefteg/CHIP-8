@@ -154,6 +154,12 @@ bool Chip8Emulator::processNextOpCode()
 			break;
 		}
 
+		case 0x5000:
+		{
+			processOpCode5XY0(opCode);
+			break;
+		}
+
 		case 0x6000:
 		{
 			processOpCode6XNN(opCode);
@@ -417,6 +423,21 @@ void Chip8Emulator::processOpCode4XNN(word opCode)
 	}
 }
 
+void Chip8Emulator::processOpCode5XY0(word opCode)
+{
+	byte x = (opCode & 0x0f00) >> 8;
+	byte y = (opCode & 0x00f0) >> 4;
+
+	if (m_dataRegisters[x] == m_dataRegisters[y])
+	{
+		m_programCounter += 4;
+	}
+	else
+	{
+		m_programCounter += 2;
+	}
+}
+
 void Chip8Emulator::processOpCode6XNN(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
@@ -645,9 +666,9 @@ void Chip8Emulator::processOpCodeFX0A(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
 
-	for (byte i = 0; i < 16; ++i)
+	for (byte i = 0; i < KeyCount; ++i)
 	{
-		if (m_keys[i] > 0)
+		if (m_keys[i] != 0)
 		{
 			m_dataRegisters[x] = i;
 			m_programCounter += 2;
