@@ -111,6 +111,8 @@ int main(int argc, char** argv)
     sf::Sound beep;
     beep.setBuffer(beepBuffer);
 
+    bool runEmulator = true;
+
     sf::Clock clock;
 	const unsigned int fps = 60;
 	const float interval = 1000 * 1000.0f / fps;
@@ -122,34 +124,44 @@ int main(int argc, char** argv)
         sf::Event event;
         while (window.pollEvent(event))
         {
+        	// Close the window.
             if (event.type == sf::Event::Closed)
             {
                 window.close();
+            }
+
+	        // Toggle emulator running.
+            if (event.type == sf::Event::KeyReleased)
+            {
+            	runEmulator = !runEmulator;
             }
         }
 
         // Start the clock to track CHIP-8 process time.
         clock.restart();
 
-        HandleChip8Inputs(chip8.getKeys());
-
-		// Update CHIP-8.
-        bool keepGoing = chip8.update();
-        if (keepGoing == false)
+        if (runEmulator == true)
         {
-        	return EXIT_FAILURE;
-        }	
+        	HandleChip8Inputs(chip8.getKeys());
 
-    	if (chip8.isBeepPlayable() == true)
-    	{
-			// BEEP !
-			beep.play();
-    	}
+			// Update CHIP-8.
+        	bool keepGoing = chip8.update();
+        	if (keepGoing == false)
+        	{
+        		return EXIT_FAILURE;
+        	}	
 
-		// draw the frame.
-        if (chip8.isDrawable() == true)
-        {
-        	Draw(window, sprite, texture, chip8.getScreenData());
+        	if (chip8.isBeepPlayable() == true)
+        	{
+				// BEEP !
+        		beep.play();
+        	}
+
+			// draw the frame.
+        	if (chip8.isDrawable() == true)
+        	{
+        		Draw(window, sprite, texture, chip8.getScreenData());
+        	}	
         }
 
         // Compute time consumed by the CHIP-8 update.
