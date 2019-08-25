@@ -67,16 +67,22 @@ void Chip8Emulator::Chip8Emulator::resetCPU()
 	memset(m_keys, 0, KeyCount);
 }
 
-void Chip8Emulator::Chip8Emulator::loadROM(const char* path)
+bool Chip8Emulator::Chip8Emulator::loadROM(const char* path)
 {
 	// Load in the game
    	FILE* fileDesc;
    	fileDesc = fopen(path, "rb");
+   	if (fileDesc == nullptr)
+   	{
+   		return false;
+   	}
 
    	// Skip CHIP-8 interpreter space in m_memory.
    	fread(&m_memory[0x200], 0xfff, 1, fileDesc);
 
    	fclose(fileDesc);
+
+   	return true;
 }
 
 bool Chip8Emulator::update()

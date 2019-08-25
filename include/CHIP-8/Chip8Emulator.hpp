@@ -49,7 +49,7 @@ namespace CHIP8
 		byte* getKeys();
 
 		void resetCPU();
-		void loadROM(const char* path);
+		bool loadROM(const char* path);
 		bool update();
 
 	private:

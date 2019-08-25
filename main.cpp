@@ -81,19 +81,21 @@ int main(int argc, char** argv)
 {
 	if (argc < 2)
 	{
-		std::cerr << "No ROM provided. Please provide a path to a valid CHIP-8 ROM.";
+		std::cerr << "No ROM provided. Please provide a path to a valid CHIP-8 ROM." << std::endl;
 		return EXIT_FAILURE;
 	}
 
 	// Get ROM path.
 	const std::string path = argv[1];
 
+	// Create CHIP-8 emulator, initialize it and load the provided ROM.
 	CHIP8::Chip8Emulator chip8;
 	chip8.resetCPU();
-	chip8.loadROM(path.c_str());
-
-	const unsigned int fps = 60;
-	float interval = 1000 * 1000.0f / fps;
+	if (chip8.loadROM(path.c_str()) == false)
+	{
+		std::cerr << "Provided CHIP-8 ROM path isn't valid. Please provide a path to a valid CHIP-8 ROM." << std::endl;
+		return EXIT_FAILURE;
+	}
 
 	sf::RenderWindow window(sf::VideoMode(CHIP8::Chip8Emulator::ScreenWidth * RenderScale, CHIP8::Chip8Emulator::ScreenHeight * RenderScale), "CHIP-8");
 
@@ -109,8 +111,14 @@ int main(int argc, char** argv)
     sf::Sound beep;
     beep.setBuffer(beepBuffer);
 
+    sf::Clock clock;
+	const unsigned int fps = 60;
+	const float interval = 1000 * 1000.0f / fps;
+
+	// Main loop.
     while (window.isOpen())
     {
+    	// Process events.
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -120,8 +128,8 @@ int main(int argc, char** argv)
             }
         }
 
-        sf::Clock clock;
-        auto timeBeforeEmulation = std::chrono::high_resolution_clock::now();
+        // Start the clock to track CHIP-8 process time.
+        clock.restart();
 
         HandleInputs(chip8.getKeys());
 
@@ -144,7 +152,10 @@ int main(int argc, char** argv)
         	Draw(window, sprite, texture, chip8.getScreenData());
         }
 
+        // Compute time consumed by the CHIP-8 update.
         sf::Time elapsed = clock.getElapsedTime();
+
+        // Compute the time to sleep to stay at a fixed framerate.
         long long sleepingDuration = interval - elapsed.asMicroseconds();
         sleepingDuration = sleepingDuration > 0 ? sleepingDuration : 0;
         // The process doesn't take 1/60 second, so wait the remaining time.
