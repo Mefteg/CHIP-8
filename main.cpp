@@ -12,7 +12,7 @@
 
 const unsigned short RenderScale = 20;
 
-void HandleInput(CHIP8::byte* keys, CHIP8::byte keyIndex, sf::Keyboard::Key key)
+void HandleChip8Input(CHIP8::byte* keys, CHIP8::byte keyIndex, sf::Keyboard::Key key)
 {
 	if (sf::Keyboard::isKeyPressed(key))
 	{
@@ -24,30 +24,30 @@ void HandleInput(CHIP8::byte* keys, CHIP8::byte keyIndex, sf::Keyboard::Key key)
 	}
 }
 
-void HandleInputs(CHIP8::byte* keys)
+void HandleChip8Inputs(CHIP8::byte* keys)
 {
 	for (int i = 0; i < 16; ++i)
 	{
 		keys[i] = 0;
 	}
 
-	HandleInput(keys, 0x0, sf::Keyboard::X);
-	HandleInput(keys, 0x1, sf::Keyboard::Num1);
-	HandleInput(keys, 0x2, sf::Keyboard::Num2);
-	HandleInput(keys, 0x3, sf::Keyboard::Num3);
-	HandleInput(keys, 0xC, sf::Keyboard::Num4);
-	HandleInput(keys, 0x4, sf::Keyboard::Q);
-	HandleInput(keys, 0x5, sf::Keyboard::W);
-	HandleInput(keys, 0x6, sf::Keyboard::E);
-	HandleInput(keys, 0xD, sf::Keyboard::R);
-	HandleInput(keys, 0x7, sf::Keyboard::A);
-	HandleInput(keys, 0x8, sf::Keyboard::S);
-	HandleInput(keys, 0x9, sf::Keyboard::D);
-	HandleInput(keys, 0xE, sf::Keyboard::F);
-	HandleInput(keys, 0xA, sf::Keyboard::Z);
-	HandleInput(keys, 0x0, sf::Keyboard::X);
-	HandleInput(keys, 0xB, sf::Keyboard::C);
-	HandleInput(keys, 0xF, sf::Keyboard::V);
+	HandleChip8Input(keys, 0x0, sf::Keyboard::X);
+	HandleChip8Input(keys, 0x1, sf::Keyboard::Num1);
+	HandleChip8Input(keys, 0x2, sf::Keyboard::Num2);
+	HandleChip8Input(keys, 0x3, sf::Keyboard::Num3);
+	HandleChip8Input(keys, 0xC, sf::Keyboard::Num4);
+	HandleChip8Input(keys, 0x4, sf::Keyboard::Q);
+	HandleChip8Input(keys, 0x5, sf::Keyboard::W);
+	HandleChip8Input(keys, 0x6, sf::Keyboard::E);
+	HandleChip8Input(keys, 0xD, sf::Keyboard::R);
+	HandleChip8Input(keys, 0x7, sf::Keyboard::A);
+	HandleChip8Input(keys, 0x8, sf::Keyboard::S);
+	HandleChip8Input(keys, 0x9, sf::Keyboard::D);
+	HandleChip8Input(keys, 0xE, sf::Keyboard::F);
+	HandleChip8Input(keys, 0xA, sf::Keyboard::Z);
+	HandleChip8Input(keys, 0x0, sf::Keyboard::X);
+	HandleChip8Input(keys, 0xB, sf::Keyboard::C);
+	HandleChip8Input(keys, 0xF, sf::Keyboard::V);
 }
 
 void Draw(sf::RenderWindow& window, sf::Sprite& sprite, sf::Texture& texture, const CHIP8::byte* screenData)
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
         // Start the clock to track CHIP-8 process time.
         clock.restart();
 
-        HandleInputs(chip8.getKeys());
+        HandleChip8Inputs(chip8.getKeys());
 
 		// Update CHIP-8.
         bool keepGoing = chip8.update();
