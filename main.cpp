@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 	chip8.loadROM(path.c_str());
 
 	const unsigned int fps = 60;
-	float interval = 1000.0f / fps;
+	float interval = 1000 * 1000.0f / fps;
 
 	sf::RenderWindow window(sf::VideoMode(CHIP8::Chip8Emulator::ScreenWidth * RenderScale, CHIP8::Chip8Emulator::ScreenHeight * RenderScale), "CHIP-8");
 
@@ -120,6 +120,7 @@ int main(int argc, char** argv)
             }
         }
 
+        sf::Clock clock;
         auto timeBeforeEmulation = std::chrono::high_resolution_clock::now();
 
         HandleInputs(chip8.getKeys());
@@ -143,14 +144,11 @@ int main(int argc, char** argv)
         	Draw(window, sprite, texture, chip8.getScreenData());
         }
 
-        auto timeAfterEmulation = std::chrono::high_resolution_clock::now();
-		auto elapsedTime = timeAfterEmulation - timeBeforeEmulation;
-        long long elapsedTimeInMillis = std::chrono::duration_cast<std::chrono::milliseconds>(elapsedTime).count();
-
-        long long sleepingDuration = interval - elapsedTimeInMillis;
+        sf::Time elapsed = clock.getElapsedTime();
+        long long sleepingDuration = interval - elapsed.asMicroseconds();
         sleepingDuration = sleepingDuration > 0 ? sleepingDuration : 0;
         // The process doesn't take 1/60 second, so wait the remaining time.
-		sf::sleep(sf::milliseconds(sleepingDuration));
+		sf::sleep(sf::microseconds(sleepingDuration));
     }
 
 	return EXIT_SUCCESS;
