@@ -112,6 +112,9 @@ int main(int argc, char** argv)
     beep.setBuffer(beepBuffer);
 
     bool runEmulator = true;
+    bool updateOneTime = false;
+    CHIP8::word initialCyclesPerFrame = chip8.getCyclesPerFrame();
+    CHIP8::word cyclesPerFrame = 1;
 
     sf::Clock clock;
 	const unsigned int fps = 60;
@@ -136,6 +139,22 @@ int main(int argc, char** argv)
             	if (event.key.code == sf::Keyboard::Space)
             	{
             		runEmulator = !runEmulator;
+            		chip8.setCyclesPerFrame(runEmulator == true ? initialCyclesPerFrame : cyclesPerFrame);
+            	}
+
+            	if (event.key.code == sf::Keyboard::Right && runEmulator == false)
+            	{
+            		updateOneTime = true;
+            	}
+
+            	if (event.key.code == sf::Keyboard::Up)
+            	{
+            		++cyclesPerFrame;
+            	}
+
+            	if (event.key.code == sf::Keyboard::Down && cyclesPerFrame > 0)
+            	{
+            		--cyclesPerFrame;
             	}
             }
         }
@@ -143,7 +162,7 @@ int main(int argc, char** argv)
         // Start the clock to track CHIP-8 process time.
         clock.restart();
 
-        if (runEmulator == true)
+        if (runEmulator == true || updateOneTime == true)
         {
         	HandleChip8Inputs(chip8.getKeys());
 
@@ -165,6 +184,8 @@ int main(int argc, char** argv)
         	{
         		Draw(window, sprite, texture, chip8.getScreenData());
         	}	
+
+        	updateOneTime = false;
         }
 
         // Compute time consumed by the CHIP-8 update.

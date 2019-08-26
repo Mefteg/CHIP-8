@@ -24,6 +24,7 @@ const byte Chip8Emulator::Fontset[80] = {
 };
 
 Chip8Emulator::Chip8Emulator()
+	: m_cyclesPerFrame(DefaultCyclesPerFrame)
 {
 
 }
@@ -46,6 +47,17 @@ bool Chip8Emulator::isDrawable() const
 byte* Chip8Emulator::getKeys()
 {
 	return m_keys;
+}
+
+
+word Chip8Emulator::getCyclesPerFrame() const
+{
+	return m_cyclesPerFrame;
+}
+
+void Chip8Emulator::setCyclesPerFrame(word cyclesPerFrame)
+{
+	m_cyclesPerFrame = cyclesPerFrame;
 }
 
 void Chip8Emulator::Chip8Emulator::resetCPU()
@@ -90,7 +102,7 @@ bool Chip8Emulator::update()
 	m_drawableFlag = false;
 	m_beepFlag = false;
 
-	for (word i = 0; i < CyclesPerFrame; ++i)
+	for (word i = 0; i < m_cyclesPerFrame; ++i)
 	{
 		bool keepGoing = processNextOpCode();
 		if (keepGoing == false)

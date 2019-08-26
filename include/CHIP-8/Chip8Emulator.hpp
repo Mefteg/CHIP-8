@@ -20,7 +20,7 @@ namespace CHIP8
 
 		static const byte Fontset[80];
 
-		static const word CyclesPerFrame = 10;
+		static const word DefaultCyclesPerFrame = 10;
 
 		byte m_memory[MemorySize];
 		byte m_dataRegisters[RegisterCount];
@@ -37,6 +37,8 @@ namespace CHIP8
 
 		byte m_keys[KeyCount];
 
+		word m_cyclesPerFrame;
+
 	public:
 		Chip8Emulator();
 
@@ -47,6 +49,9 @@ namespace CHIP8
 		bool isDrawable() const;
 
 		byte* getKeys();
+
+		word getCyclesPerFrame() const;
+		void setCyclesPerFrame(word cyclesPerFrame);
 
 		void resetCPU();
 		bool loadROM(const char* path);
