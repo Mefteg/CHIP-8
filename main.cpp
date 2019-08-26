@@ -133,7 +133,10 @@ int main(int argc, char** argv)
 	        // Toggle emulator running.
             if (event.type == sf::Event::KeyReleased)
             {
-            	runEmulator = !runEmulator;
+            	if (event.key.code == sf::Keyboard::Space)
+            	{
+            		runEmulator = !runEmulator;
+            	}
             }
         }
 
