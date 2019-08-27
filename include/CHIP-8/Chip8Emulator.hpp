@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stack>
+#include <unordered_map>
 
 #include "Chip8Types.hpp"
 
@@ -8,6 +9,8 @@ namespace CHIP8
 {
 	class Chip8Emulator
 	{
+		using OpCodeProcessor = void (Chip8Emulator::*)(word);
+
 	public:
 		static const byte ScreenWidth = 64;
 		static const byte ScreenHeight = 32;
@@ -39,6 +42,8 @@ namespace CHIP8
 
 		word m_cyclesPerFrame;
 
+		std::unordered_map<word, OpCodeProcessor> m_opCodeProcessorMap;
+
 	public:
 		Chip8Emulator();
 
@@ -61,6 +66,7 @@ namespace CHIP8
 		bool processNextOpCode();
 		word getNextOpCode();
 
+		void processOpCodeGroup0(word opCode);
 		void processOpCode00E0(word opCode);
 		void processOpCode00EE(word opCode);
 
@@ -78,6 +84,7 @@ namespace CHIP8
 
 		void processOpCode7XNN(word opCode);
 
+		void processOpCodeGroup8(word opCode);
 		void processOpCode8XY0(word opCode);
 		void processOpCode8XY1(word opCode);
 		void processOpCode8XY2(word opCode);
@@ -95,9 +102,11 @@ namespace CHIP8
 
 		void processOpCodeDXYN(word opCode);
 
+		void processOpCodeGroupE(word opCode);
 		void processOpCodeEX9E(word opCode);
 		void processOpCodeEXA1(word opCode);
 
+		void processOpCodeGroupF(word opCode);
 		void processOpCodeFX07(word opCode);
 		void processOpCodeFX0A(word opCode);
 		void processOpCodeFX15(word opCode);

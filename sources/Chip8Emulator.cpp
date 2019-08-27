@@ -26,7 +26,21 @@ const byte Chip8Emulator::Fontset[80] = {
 Chip8Emulator::Chip8Emulator()
 	: m_cyclesPerFrame(DefaultCyclesPerFrame)
 {
-
+	m_opCodeProcessorMap.insert({0x0, &Chip8Emulator::processOpCodeGroup0});
+	m_opCodeProcessorMap.insert({0x1, &Chip8Emulator::processOpCode1NNN});
+	m_opCodeProcessorMap.insert({0x2, &Chip8Emulator::processOpCode2NNN});
+	m_opCodeProcessorMap.insert({0x3, &Chip8Emulator::processOpCode3XNN});
+	m_opCodeProcessorMap.insert({0x4, &Chip8Emulator::processOpCode4XNN});
+	m_opCodeProcessorMap.insert({0x5, &Chip8Emulator::processOpCode5XY0});
+	m_opCodeProcessorMap.insert({0x6, &Chip8Emulator::processOpCode6XNN});
+	m_opCodeProcessorMap.insert({0x7, &Chip8Emulator::processOpCode7XNN});
+	m_opCodeProcessorMap.insert({0x8, &Chip8Emulator::processOpCodeGroup8});
+	m_opCodeProcessorMap.insert({0x9, &Chip8Emulator::processOpCode9XY0});
+	m_opCodeProcessorMap.insert({0xa, &Chip8Emulator::processOpCodeANNN});
+	m_opCodeProcessorMap.insert({0xc, &Chip8Emulator::processOpCodeCXNN});
+	m_opCodeProcessorMap.insert({0xd, &Chip8Emulator::processOpCodeDXYN});
+	m_opCodeProcessorMap.insert({0xe, &Chip8Emulator::processOpCodeGroupE});
+	m_opCodeProcessorMap.insert({0xf, &Chip8Emulator::processOpCodeGroupF});
 }
 
 bool Chip8Emulator::isBeepPlayable() const
@@ -120,262 +134,17 @@ bool Chip8Emulator::processNextOpCode()
 {
 	word opCode = getNextOpCode();
 
-	switch (opCode & 0xf000)
+	// Find OpCode/OpCodeGroup processor regarding bigger digit.
+	int processorKey = (opCode & 0xf000) >> 12;
+	auto processor = m_opCodeProcessorMap.find(processorKey);
+	if (processor == m_opCodeProcessorMap.end())
 	{
-		case 0x0000:
-		{
-			switch (opCode & 0x000f)
-			{
-				case 0x0000:
-				{
-					processOpCode00E0(opCode);
-					break;
-				}
-
-				case 0x000e:
-				{
-					processOpCode00EE(opCode);
-					break;
-				}
-
-				default:
-				{
-					unknownOpCode(opCode);
-					return false;
-				}
-			}
-
-			break;
-		}
-
-		case 0x1000:
-		{
-			processOpCode1NNN(opCode);
-			break;
-		}
-
-		case 0x2000:
-		{
-			processOpCode2NNN(opCode);
-			break;
-		}
-
-		case 0x3000:
-		{
-			processOpCode3XNN(opCode);
-			break;
-		}
-
-		case 0x4000:
-		{
-			processOpCode4XNN(opCode);
-			break;
-		}
-
-		case 0x5000:
-		{
-			processOpCode5XY0(opCode);
-			break;
-		}
-
-		case 0x6000:
-		{
-			processOpCode6XNN(opCode);
-			break;
-		}
-
-		case 0x7000:
-		{
-			processOpCode7XNN(opCode);
-			break;
-		}
-
-		case 0x8000:
-		{
-			switch (opCode & 0x000f)
-			{
-				case 0x0000:
-				{
-					processOpCode8XY0(opCode);
-					break;
-				}
-
-				case 0x0001:
-				{
-					processOpCode8XY1(opCode);
-					break;
-				}
-
-				case 0x0002:
-				{
-					processOpCode8XY2(opCode);
-					break;
-				}
-
-				case 0x0003:
-				{
-					processOpCode8XY3(opCode);
-					break;
-				}
-
-				case 0x0004:
-				{
-					processOpCode8XY4(opCode);
-					break;
-				}
-
-				case 0x0005:
-				{
-					processOpCode8XY5(opCode);
-					break;
-				}
-
-				case 0x0006:
-				{
-					processOpCode8XY6(opCode);
-					break;
-				}
-
-				case 0x000e:
-				{
-					processOpCode8XYE(opCode);
-					break;
-				}
-
-				default:
-				{
-					unknownOpCode(opCode);
-					return false;
-				}
-			}
-
-			break;
-		}
-
-		case 0x9000:
-		{
-			processOpCode9XY0(opCode);
-			break;
-		}
-
-		case 0xa000:
-		{
-			processOpCodeANNN(opCode);
-			break;
-		}
-
-		case 0xc000:
-		{
-			processOpCodeCXNN(opCode);
-			break;
-		}
-
-		case 0xd000:
-		{
-			processOpCodeDXYN(opCode);
-			break;
-		}
-
-		case 0xe000:
-		{
-			switch (opCode & 0x00ff)
-			{
-				case 0x009E:
-				{
-					processOpCodeEX9E(opCode);
-					break;
-				}
-
-				case 0x00A1:
-				{
-					processOpCodeEXA1(opCode);
-					break;
-				}
-
-				default:
-				{
-					unknownOpCode(opCode);
-					return false;
-				}
-			}
-
-			break;	
-		}
-
-		case 0xf000:
-		{
-			switch (opCode & 0x00ff)
-			{
-				case 0x0007:
-				{
-					processOpCodeFX07(opCode);
-					break;
-				}
-
-				case 0x000A:
-				{
-					processOpCodeFX0A(opCode);
-					break;
-				}
-
-				case 0x0015:
-				{
-					processOpCodeFX15(opCode);
-					break;
-				}
-
-				case 0x0018:
-				{
-					processOpCodeFX18(opCode);
-					break;
-				}
-
-				case 0x001e:
-				{
-					processOpCodeFX1E(opCode);
-					break;
-				}
-
-				case 0x0029:
-				{
-					processOpCodeFX29(opCode);
-					break;
-				}
-
-				case 0x0033:
-				{
-					processOpCodeFX33(opCode);
-					break;
-				}
-
-				case 0x0055:
-				{
-					processOpCodeFX55(opCode);
-					break;
-				}
-
-				case 0x0065:
-				{
-					processOpCodeFX65(opCode);
-					break;
-				}
-
-				default:
-				{
-					unknownOpCode(opCode);
-					return false;
-				}
-			}
-
-			break;
-		}
-
-		default:
-		{
-			unknownOpCode(opCode);
-			return false;
-		}
+		unknownOpCode(opCode);
+		return false;
 	}
+
+	// Call OpCode/OpCodeGroup processor.
+	std::invoke(processor->second, *this, opCode);
 
 	return true;
 }
@@ -388,6 +157,31 @@ word Chip8Emulator::getNextOpCode()
 	};
 
 	return *((word*)opCode);
+}
+
+
+void Chip8Emulator::processOpCodeGroup0(word opCode)
+{
+	switch (opCode & 0x000f)
+	{
+		case 0x0000:
+		{
+			processOpCode00E0(opCode);
+			break;
+		}
+
+		case 0x000e:
+		{
+			processOpCode00EE(opCode);
+			break;
+		}
+
+		default:
+		{
+			unknownOpCode(opCode);
+			break;
+		}
+	}	
 }
 
 void Chip8Emulator::processOpCode00E0(word opCode)
@@ -472,6 +266,66 @@ void Chip8Emulator::processOpCode7XNN(word opCode)
 	m_dataRegisters[x] += opCode & 0x00ff;
 
 	m_programCounter += 2;
+}
+
+void Chip8Emulator::processOpCodeGroup8(word opCode)
+{
+	switch (opCode & 0x000f)
+	{
+		case 0x0000:
+		{
+			processOpCode8XY0(opCode);
+			break;
+		}
+
+		case 0x0001:
+		{
+			processOpCode8XY1(opCode);
+			break;
+		}
+
+		case 0x0002:
+		{
+			processOpCode8XY2(opCode);
+			break;
+		}
+
+		case 0x0003:
+		{
+			processOpCode8XY3(opCode);
+			break;
+		}
+
+		case 0x0004:
+		{
+			processOpCode8XY4(opCode);
+			break;
+		}
+
+		case 0x0005:
+		{
+			processOpCode8XY5(opCode);
+			break;
+		}
+
+		case 0x0006:
+		{
+			processOpCode8XY6(opCode);
+			break;
+		}
+
+		case 0x000e:
+		{
+			processOpCode8XYE(opCode);
+			break;
+		}
+
+		default:
+		{
+			unknownOpCode(opCode);
+			break;
+		}
+	}	
 }
 
 void Chip8Emulator::processOpCode8XY0(word opCode)
@@ -646,6 +500,30 @@ void Chip8Emulator::processOpCodeDXYN(word opCode)
 	m_programCounter += 2;
 }
 
+void Chip8Emulator::processOpCodeGroupE(word opCode)
+{
+	switch (opCode & 0x00ff)
+	{
+		case 0x009E:
+		{
+			processOpCodeEX9E(opCode);
+			break;
+		}
+
+		case 0x00A1:
+		{
+			processOpCodeEXA1(opCode);
+			break;
+		}
+
+		default:
+		{
+			unknownOpCode(opCode);
+			break;
+		}
+	}	
+}
+
 void Chip8Emulator::processOpCodeEX9E(word opCode)
 {
 	byte x = (opCode & 0x0f00) >> 8;
@@ -669,6 +547,72 @@ void Chip8Emulator::processOpCodeEXA1(word opCode)
 	else
 	{
 		m_programCounter += 2;
+	}
+}
+
+void Chip8Emulator::processOpCodeGroupF(word opCode)
+{
+	switch (opCode & 0x00ff)
+	{
+		case 0x0007:
+		{
+			processOpCodeFX07(opCode);
+			break;
+		}
+
+		case 0x000A:
+		{
+			processOpCodeFX0A(opCode);
+			break;
+		}
+
+		case 0x0015:
+		{
+			processOpCodeFX15(opCode);
+			break;
+		}
+
+		case 0x0018:
+		{
+			processOpCodeFX18(opCode);
+			break;
+		}
+
+		case 0x001e:
+		{
+			processOpCodeFX1E(opCode);
+			break;
+		}
+
+		case 0x0029:
+		{
+			processOpCodeFX29(opCode);
+			break;
+		}
+
+		case 0x0033:
+		{
+			processOpCodeFX33(opCode);
+			break;
+		}
+
+		case 0x0055:
+		{
+			processOpCodeFX55(opCode);
+			break;
+		}
+
+		case 0x0065:
+		{
+			processOpCodeFX65(opCode);
+			break;
+		}
+
+		default:
+		{
+			unknownOpCode(opCode);
+			break;
+		}
 	}
 }
 
