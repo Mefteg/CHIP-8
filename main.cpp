@@ -61,12 +61,12 @@ void Draw(sf::RenderWindow& window, sf::Sprite& sprite, sf::Texture& texture, co
 		for (unsigned int j = 0; j < CHIP8::Chip8Emulator::ScreenHeight; ++j)
 	    {
 	    	CHIP8::word chip8PixelIndex = (i * CHIP8::Chip8Emulator::ScreenHeight) + j;
-	    	CHIP8::byte color = screenData[chip8PixelIndex] == 0 ? 0 : 0xff;
+	    	CHIP8::byte color = screenData[chip8PixelIndex] == 0 ? 0 : 0xFF;
 	    	unsigned int index = (j * CHIP8::Chip8Emulator::ScreenWidth + i) * 4;
 	        pixels[index] = color;
 	        pixels[index + 1] = color;
 	        pixels[index + 2] = color;
-	        pixels[index + 3] = 0xff;
+	        pixels[index + 3] = 0xFF;
 	    }
 	}
 
