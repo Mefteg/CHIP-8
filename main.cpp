@@ -52,8 +52,6 @@ void HandleChip8Inputs(CHIP8::byte* keys)
 
 void Draw(sf::RenderWindow& window, sf::Sprite& sprite, sf::Texture& texture, const CHIP8::byte* screenData)
 {
-	window.clear();
-
 	unsigned short pixelCount = CHIP8::Chip8Emulator::ScreenWidth * CHIP8::Chip8Emulator::ScreenHeight;
 	CHIP8::byte pixels[pixelCount * 4];
 	for (unsigned int i = 0; i < CHIP8::Chip8Emulator::ScreenWidth; ++i)
@@ -73,8 +71,6 @@ void Draw(sf::RenderWindow& window, sf::Sprite& sprite, sf::Texture& texture, co
 	texture.update(pixels);
 
 	window.draw(sprite);
-
-	window.display();
 }
 
 int main(int argc, char** argv)
@@ -107,9 +103,28 @@ int main(int argc, char** argv)
     sprite.setScale(sf::Vector2f(RenderScale, RenderScale));
 
     sf::SoundBuffer beepBuffer;
-    beepBuffer.loadFromFile("../resources/sounds/beep.wav");
+    if (beepBuffer.loadFromFile("../resources/sounds/beep.wav") == false)
+    {
+    	std::cerr << "Error loading sound." << std::endl;
+    	return EXIT_FAILURE;
+    }
+
     sf::Sound beep;
     beep.setBuffer(beepBuffer);
+
+    sf::Font font;
+    if (font.loadFromFile("../resources/fonts/8bit16.ttf") == false)
+    {
+    	std::cerr << "Error loading font." << std::endl;
+    	return EXIT_FAILURE;
+    }
+
+    sf::Text text;
+    text.setFont(font);
+    text.setCharacterSize(24);
+    text.setFillColor(sf::Color::White);
+    text.setString("Test 01");
+    text.setPosition(0, 0);
 
     bool runEmulator = true;
     bool updateOneTime = false;
@@ -123,6 +138,8 @@ int main(int argc, char** argv)
 	// Main loop.
     while (window.isOpen())
     {
+    	window.clear();
+
     	// Process events.
         sf::Event event;
         while (window.pollEvent(event))
@@ -182,11 +199,16 @@ int main(int argc, char** argv)
 			// draw the frame.
         	if (chip8.isDrawable() == true)
         	{
-        		Draw(window, sprite, texture, chip8.getScreenData());
+        		//Draw(window, sprite, texture, chip8.getScreenData());
         	}	
 
         	updateOneTime = false;
         }
+
+        Draw(window, sprite, texture, chip8.getScreenData());
+        window.draw(text);
+
+        window.display();
 
         // Compute time consumed by the CHIP-8 update.
         sf::Time elapsed = clock.getElapsedTime();
