@@ -196,12 +196,6 @@ int main(int argc, char** argv)
         		beep.play();
         	}
 
-			// draw the frame.
-        	if (chip8.isDrawable() == true)
-        	{
-        		//Draw(window, sprite, texture, chip8.getScreenData());
-        	}	
-
         	updateOneTime = false;
         }
 
