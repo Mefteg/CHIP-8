@@ -41,6 +41,31 @@ Chip8Emulator::Chip8Emulator()
 	m_opCodeProcessorMap.insert({0xd, &Chip8Emulator::processOpCodeDXYN});
 	m_opCodeProcessorMap.insert({0xe, &Chip8Emulator::processOpCodeGroupE});
 	m_opCodeProcessorMap.insert({0xf, &Chip8Emulator::processOpCodeGroupF});
+
+	m_opCodeGroup0ProcessorMap.insert({0x0, &Chip8Emulator::processOpCode00E0});
+	m_opCodeGroup0ProcessorMap.insert({0xe, &Chip8Emulator::processOpCode00EE});
+
+	m_opCodeGroup8ProcessorMap.insert({0x0, &Chip8Emulator::processOpCode8XY0});
+	m_opCodeGroup8ProcessorMap.insert({0x1, &Chip8Emulator::processOpCode8XY1});
+	m_opCodeGroup8ProcessorMap.insert({0x2, &Chip8Emulator::processOpCode8XY2});
+	m_opCodeGroup8ProcessorMap.insert({0x3, &Chip8Emulator::processOpCode8XY3});
+	m_opCodeGroup8ProcessorMap.insert({0x4, &Chip8Emulator::processOpCode8XY4});
+	m_opCodeGroup8ProcessorMap.insert({0x5, &Chip8Emulator::processOpCode8XY5});
+	m_opCodeGroup8ProcessorMap.insert({0x6, &Chip8Emulator::processOpCode8XY6});
+	m_opCodeGroup8ProcessorMap.insert({0xe, &Chip8Emulator::processOpCode8XYE});
+
+	m_opCodeGroupEProcessorMap.insert({0x9e, &Chip8Emulator::processOpCodeEX9E});
+	m_opCodeGroupEProcessorMap.insert({0xa1, &Chip8Emulator::processOpCodeEXA1});
+
+	m_opCodeGroupFProcessorMap.insert({0x07, &Chip8Emulator::processOpCodeFX07});
+	m_opCodeGroupFProcessorMap.insert({0x0A, &Chip8Emulator::processOpCodeFX0A});
+	m_opCodeGroupFProcessorMap.insert({0x15, &Chip8Emulator::processOpCodeFX15});
+	m_opCodeGroupFProcessorMap.insert({0x18, &Chip8Emulator::processOpCodeFX18});
+	m_opCodeGroupFProcessorMap.insert({0x1e, &Chip8Emulator::processOpCodeFX1E});
+	m_opCodeGroupFProcessorMap.insert({0x29, &Chip8Emulator::processOpCodeFX29});
+	m_opCodeGroupFProcessorMap.insert({0x33, &Chip8Emulator::processOpCodeFX33});
+	m_opCodeGroupFProcessorMap.insert({0x55, &Chip8Emulator::processOpCodeFX55});
+	m_opCodeGroupFProcessorMap.insert({0x65, &Chip8Emulator::processOpCodeFX65});
 }
 
 bool Chip8Emulator::isBeepPlayable() const
@@ -130,25 +155,6 @@ bool Chip8Emulator::update()
 	return true;
 }
 
-bool Chip8Emulator::processNextOpCode()
-{
-	word opCode = getNextOpCode();
-
-	// Find OpCode/OpCodeGroup processor regarding bigger digit.
-	int processorKey = (opCode & 0xf000) >> 12;
-	auto processor = m_opCodeProcessorMap.find(processorKey);
-	if (processor == m_opCodeProcessorMap.end())
-	{
-		unknownOpCode(opCode);
-		return false;
-	}
-
-	// Call OpCode/OpCodeGroup processor.
-	std::invoke(processor->second, *this, opCode);
-
-	return true;
-}
-
 word Chip8Emulator::getNextOpCode()
 {
 	byte opCode[2] = {
@@ -159,29 +165,31 @@ word Chip8Emulator::getNextOpCode()
 	return *((word*)opCode);
 }
 
+bool Chip8Emulator::processOpCodeInMap(const std::unordered_map<word, OpCodeProcessor>& processMap, byte key, word opCode)
+{
+	auto processor = processMap.find(key);
+	if (processor == processMap.end())
+	{
+		unknownOpCode(opCode);
+		return false;
+	}
+
+	// Call OpCode/OpCodeGroup processor.
+	std::invoke(processor->second, *this, opCode);	
+
+	return true;
+}
+
+bool Chip8Emulator::processNextOpCode()
+{
+	word opCode = getNextOpCode();
+
+	return processOpCodeInMap(m_opCodeProcessorMap, (opCode & 0xf000) >> 12, opCode);
+}
 
 void Chip8Emulator::processOpCodeGroup0(word opCode)
 {
-	switch (opCode & 0x000f)
-	{
-		case 0x0000:
-		{
-			processOpCode00E0(opCode);
-			break;
-		}
-
-		case 0x000e:
-		{
-			processOpCode00EE(opCode);
-			break;
-		}
-
-		default:
-		{
-			unknownOpCode(opCode);
-			break;
-		}
-	}	
+	processOpCodeInMap(m_opCodeGroup0ProcessorMap, opCode & 0x000f, opCode);
 }
 
 void Chip8Emulator::processOpCode00E0(word opCode)
@@ -270,62 +278,7 @@ void Chip8Emulator::processOpCode7XNN(word opCode)
 
 void Chip8Emulator::processOpCodeGroup8(word opCode)
 {
-	switch (opCode & 0x000f)
-	{
-		case 0x0000:
-		{
-			processOpCode8XY0(opCode);
-			break;
-		}
-
-		case 0x0001:
-		{
-			processOpCode8XY1(opCode);
-			break;
-		}
-
-		case 0x0002:
-		{
-			processOpCode8XY2(opCode);
-			break;
-		}
-
-		case 0x0003:
-		{
-			processOpCode8XY3(opCode);
-			break;
-		}
-
-		case 0x0004:
-		{
-			processOpCode8XY4(opCode);
-			break;
-		}
-
-		case 0x0005:
-		{
-			processOpCode8XY5(opCode);
-			break;
-		}
-
-		case 0x0006:
-		{
-			processOpCode8XY6(opCode);
-			break;
-		}
-
-		case 0x000e:
-		{
-			processOpCode8XYE(opCode);
-			break;
-		}
-
-		default:
-		{
-			unknownOpCode(opCode);
-			break;
-		}
-	}	
+	processOpCodeInMap(m_opCodeGroup8ProcessorMap, opCode & 0x000f, opCode);
 }
 
 void Chip8Emulator::processOpCode8XY0(word opCode)
@@ -502,26 +455,7 @@ void Chip8Emulator::processOpCodeDXYN(word opCode)
 
 void Chip8Emulator::processOpCodeGroupE(word opCode)
 {
-	switch (opCode & 0x00ff)
-	{
-		case 0x009E:
-		{
-			processOpCodeEX9E(opCode);
-			break;
-		}
-
-		case 0x00A1:
-		{
-			processOpCodeEXA1(opCode);
-			break;
-		}
-
-		default:
-		{
-			unknownOpCode(opCode);
-			break;
-		}
-	}	
+	processOpCodeInMap(m_opCodeGroupEProcessorMap, opCode & 0x00ff, opCode);
 }
 
 void Chip8Emulator::processOpCodeEX9E(word opCode)
@@ -552,68 +486,7 @@ void Chip8Emulator::processOpCodeEXA1(word opCode)
 
 void Chip8Emulator::processOpCodeGroupF(word opCode)
 {
-	switch (opCode & 0x00ff)
-	{
-		case 0x0007:
-		{
-			processOpCodeFX07(opCode);
-			break;
-		}
-
-		case 0x000A:
-		{
-			processOpCodeFX0A(opCode);
-			break;
-		}
-
-		case 0x0015:
-		{
-			processOpCodeFX15(opCode);
-			break;
-		}
-
-		case 0x0018:
-		{
-			processOpCodeFX18(opCode);
-			break;
-		}
-
-		case 0x001e:
-		{
-			processOpCodeFX1E(opCode);
-			break;
-		}
-
-		case 0x0029:
-		{
-			processOpCodeFX29(opCode);
-			break;
-		}
-
-		case 0x0033:
-		{
-			processOpCodeFX33(opCode);
-			break;
-		}
-
-		case 0x0055:
-		{
-			processOpCodeFX55(opCode);
-			break;
-		}
-
-		case 0x0065:
-		{
-			processOpCodeFX65(opCode);
-			break;
-		}
-
-		default:
-		{
-			unknownOpCode(opCode);
-			break;
-		}
-	}
+	processOpCodeInMap(m_opCodeGroupFProcessorMap, opCode & 0x00ff, opCode);
 }
 
 void Chip8Emulator::processOpCodeFX07(word opCode)

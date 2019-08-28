@@ -43,6 +43,10 @@ namespace CHIP8
 		word m_cyclesPerFrame;
 
 		std::unordered_map<word, OpCodeProcessor> m_opCodeProcessorMap;
+		std::unordered_map<word, OpCodeProcessor> m_opCodeGroup0ProcessorMap;
+		std::unordered_map<word, OpCodeProcessor> m_opCodeGroup8ProcessorMap;
+		std::unordered_map<word, OpCodeProcessor> m_opCodeGroupEProcessorMap;
+		std::unordered_map<word, OpCodeProcessor> m_opCodeGroupFProcessorMap;
 
 	public:
 		Chip8Emulator();
@@ -63,8 +67,9 @@ namespace CHIP8
 		bool update();
 
 	private:
-		bool processNextOpCode();
 		word getNextOpCode();
+		bool processOpCodeInMap(const std::unordered_map<word, OpCodeProcessor>& processMap, byte key, word opCode);
+		bool processNextOpCode();
 
 		void processOpCodeGroup0(word opCode);
 		void processOpCode00E0(word opCode);
