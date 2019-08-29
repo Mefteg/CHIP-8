@@ -4,11 +4,15 @@
 #include <iostream>
 #include <chrono>
 #include <vector>
+#include <sstream>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
 #include <CHIP-8/Chip8Emulator.hpp>
+
+#include <SceneGraph/GroupNode.hpp>
+#include <SceneGraph/TextNode.hpp>
 
 const unsigned short RenderScale = 20;
 
@@ -50,7 +54,7 @@ void HandleChip8Inputs(CHIP8::byte* keys)
 	HandleChip8Input(keys, 0xF, sf::Keyboard::V);
 }
 
-void Draw(sf::RenderWindow& window, sf::Sprite& sprite, sf::Texture& texture, const CHIP8::byte* screenData)
+void DrawChip8(sf::RenderWindow& window, sf::Sprite& sprite, sf::Texture& texture, const CHIP8::byte* screenData)
 {
 	unsigned short pixelCount = CHIP8::Chip8Emulator::ScreenWidth * CHIP8::Chip8Emulator::ScreenHeight;
 	CHIP8::byte pixels[pixelCount * 4];
@@ -70,7 +74,25 @@ void Draw(sf::RenderWindow& window, sf::Sprite& sprite, sf::Texture& texture, co
 
 	texture.update(pixels);
 
+	sprite.setPosition(0, 0);
+
 	window.draw(sprite);
+}
+
+std::string IntToString(int i)
+{
+	std::stringstream stream;
+	stream << i;
+
+	return stream.str();
+}
+
+std::string IntAsHexToString(int i)
+{
+	std::stringstream stream;
+	stream << std::hex << i;
+
+	return stream.str();
 }
 
 int main(int argc, char** argv)
@@ -93,7 +115,11 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	sf::RenderWindow window(sf::VideoMode(CHIP8::Chip8Emulator::ScreenWidth * RenderScale, CHIP8::Chip8Emulator::ScreenHeight * RenderScale), "CHIP-8");
+	sf::Vector2u defaultWindowSize(CHIP8::Chip8Emulator::ScreenWidth * RenderScale, CHIP8::Chip8Emulator::ScreenHeight * RenderScale);
+	sf::Vector2u debugWindowSize(defaultWindowSize.x + 200, defaultWindowSize.y + 16 * (24 + 2));
+	sf::RenderWindow window(sf::VideoMode(defaultWindowSize.x, defaultWindowSize.y), "CHIP-8");
+	const sf::View& defaultWindowView = window.getDefaultView();
+	const sf::View debugWindowView(sf::FloatRect(0, 0, debugWindowSize.x, debugWindowSize.y));
 
 	sf::Texture texture;
     texture.create(CHIP8::Chip8Emulator::ScreenWidth, CHIP8::Chip8Emulator::ScreenHeight);
@@ -119,13 +145,24 @@ int main(int argc, char** argv)
     	return EXIT_FAILURE;
     }
 
-    sf::Text text;
-    text.setFont(font);
-    text.setCharacterSize(24);
-    text.setFillColor(sf::Color::White);
-    text.setString("Test 01");
-    text.setPosition(0, 0);
+    SceneGraph::GroupNode root;
+    sf::Transform rootTransform;
+    rootTransform.translate(0, CHIP8::Chip8Emulator::ScreenHeight * RenderScale + 10);
+    root.setTransform(rootTransform);
 
+    SceneGraph::TextNode registerTextNodes[16];
+    for (int i = 0; i < 16; ++i)
+    {
+        sf::Text& text = registerTextNodes[i].getText();
+        text.setFont(font);
+        text.setCharacterSize(24);
+        text.setFillColor(sf::Color::White);
+        text.setPosition(0, i * (24 + 1));	
+
+        root.addChild(&registerTextNodes[i]);
+    }
+
+    bool debugMode = false;
     bool runEmulator = true;
     bool updateOneTime = false;
     CHIP8::word initialCyclesPerFrame = chip8.getCyclesPerFrame();
@@ -173,6 +210,22 @@ int main(int argc, char** argv)
             	{
             		--cyclesPerFrame;
             	}
+
+            	if (event.key.code == sf::Keyboard::B)
+            	{
+            		if (debugMode == true)
+            		{
+            			window.setSize(defaultWindowSize);
+            			window.setView(defaultWindowView);
+            			debugMode = false;
+            		}
+            		else
+            		{
+            			window.setSize(debugWindowSize);
+            			window.setView(debugWindowView);
+            			debugMode = true;
+            		}
+            	}
             }
         }
 
@@ -199,8 +252,16 @@ int main(int argc, char** argv)
         	updateOneTime = false;
         }
 
-        Draw(window, sprite, texture, chip8.getScreenData());
-        window.draw(text);
+        DrawChip8(window, sprite, texture, chip8.getScreenData());
+        if (debugMode == true)
+        {
+        	for (int i = 0; i < 16; ++i)
+        	{
+        		sf::Text& text = registerTextNodes[i].getText();
+        		text.setString(sf::String("V[") + sf::String(IntAsHexToString(i)) + sf::String("] = ") + sf::String(IntAsHexToString(chip8.getDataRegister(i))));
+        	}
+        	root.draw(window, sf::Transform::Identity);
+        }
 
         window.display();
 

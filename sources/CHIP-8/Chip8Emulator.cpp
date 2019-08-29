@@ -68,6 +68,16 @@ Chip8Emulator::Chip8Emulator()
 	m_opCodeGroupFProcessorMap.insert({0x65, &Chip8Emulator::processOpCodeFX65});
 }
 
+byte Chip8Emulator::getDataRegister(byte index) const
+{
+	if (index >= RegisterCount)
+	{
+		return 0;
+	}
+
+	return m_dataRegisters[index];
+}
+
 bool Chip8Emulator::isBeepPlayable() const
 {
 	return m_beepFlag;

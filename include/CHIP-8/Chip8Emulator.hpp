@@ -51,6 +51,8 @@ namespace CHIP8
 	public:
 		Chip8Emulator();
 
+		byte getDataRegister(byte index) const;
+
 		bool isBeepPlayable() const;
 
 		const byte* getScreenData() const;

@@ -10,8 +10,8 @@ include_directories("include")
 link_directories("lib")
 
 # Sources & Headers
-file(GLOB SOURCES
-    ./*.cpp
+file(GLOB_RECURSE SOURCES
+    ./main.cpp
     ./sources/*.cpp
 )
 
