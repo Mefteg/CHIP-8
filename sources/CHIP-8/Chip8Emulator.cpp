@@ -52,6 +52,7 @@ Chip8Emulator::Chip8Emulator()
 	m_opCodeGroup8ProcessorMap.insert({0x4, &Chip8Emulator::processOpCode8XY4});
 	m_opCodeGroup8ProcessorMap.insert({0x5, &Chip8Emulator::processOpCode8XY5});
 	m_opCodeGroup8ProcessorMap.insert({0x6, &Chip8Emulator::processOpCode8XY6});
+	m_opCodeGroup8ProcessorMap.insert({0x7, &Chip8Emulator::processOpCode8XY7});
 	m_opCodeGroup8ProcessorMap.insert({0xE, &Chip8Emulator::processOpCode8XYE});
 
 	m_opCodeGroupEProcessorMap.insert({0x9E, &Chip8Emulator::processOpCodeEX9E});
@@ -353,13 +354,7 @@ void Chip8Emulator::processOpCode8XY5(word opCode)
 	byte x = (opCode & 0x0F00) >> 8;
 	byte y = (opCode & 0x00F0) >> 4;
 
-	short valueX = m_dataRegisters[x];
-	short valueY = m_dataRegisters[y];
-
-	short newValue = valueX + valueY;
-
-	m_dataRegisters[0xF] = m_dataRegisters[x] < m_dataRegisters[y] ? 0 : 1;
-
+	m_dataRegisters[0xF] = m_dataRegisters[x] > m_dataRegisters[y] ? 1 : 0;
 	m_dataRegisters[x] -= m_dataRegisters[y];
 
 	m_programCounter += 2;
@@ -372,6 +367,17 @@ void Chip8Emulator::processOpCode8XY6(word opCode)
 
 	m_dataRegisters[0xF] = valueX & 0x1;
 	m_dataRegisters[x] >>= 1;
+
+	m_programCounter += 2;
+}
+
+void Chip8Emulator::processOpCode8XY7(word opCode)
+{
+	byte x = (opCode & 0x0F00) >> 8;
+	byte y = (opCode & 0x00F0) >> 4;
+
+	m_dataRegisters[0xF] = m_dataRegisters[y] > m_dataRegisters[x] ? 1 : 0;
+	m_dataRegisters[x] = m_dataRegisters[y] - m_dataRegisters[x];
 
 	m_programCounter += 2;
 }
@@ -584,8 +590,6 @@ void Chip8Emulator::processOpCodeFX55(word opCode)
 		m_memory[m_addressRegisterI + i] = m_dataRegisters[i];
 	}
 
-	m_addressRegisterI += x + 1;
-
 	m_programCounter += 2;
 }
 
@@ -597,8 +601,6 @@ void Chip8Emulator::processOpCodeFX65(word opCode)
 	{
 		m_dataRegisters[i] = m_memory[m_addressRegisterI + i];
 	}
-
-	m_addressRegisterI += x + 1;
 
 	m_programCounter += 2;
 }

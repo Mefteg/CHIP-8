@@ -99,6 +99,7 @@ namespace CHIP8
 		void processOpCode8XY4(word opCode);
 		void processOpCode8XY5(word opCode);
 		void processOpCode8XY6(word opCode);
+		void processOpCode8XY7(word opCode);
 		void processOpCode8XYE(word opCode);
 
 		void processOpCode9XY0(word opCode);
